@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Print Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .bill-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .bill-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .bill-header h2 {
+                font-size: 24px;
+                color: #333;
+            }
+
+        .bill-info p {
+            margin: 5px 0;
+        }
+
+            .bill-info p strong {
+                font-weight: bold;
+            }
+
+        .bill-items {
+            margin-top: 20px;
+        }
+
+            .bill-items table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .bill-items th,
+            .bill-items td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #ccc;
+            }
+
+            .bill-items th {
+                background-color: #f2f2f2;
+            }
+
+            .bill-items td:last-child {
+                text-align: right;
+            }
+
+        .bill-total {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+            .bill-total p {
+                margin-bottom: 5px;
+            }
+
+        .qr-code-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .qr-code-container img {
+                max-width: 200px;
+                max-height: 200px;
+            }
+
+        .thank-you-message {
+            margin-top: 30px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .print-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <div class="bill-header">
+            <h2>Bill</h2>
+        </div>
+        <div class="bill-info">
+            <p><strong>Customer Name:</strong> @Model.CustomerName</p>
+            <p><strong>Total Amount:</strong> @Model.TotalAmount</p>
+            <p><strong>Bill Created Date:</strong> @Model.BillCreatedDate?.ToString("dd/MM/yyyy")</p>
+            <p><strong>Product Quantity:</strong> @Model.ProductQuantity</p>
+            <p><strong>Product Name:</strong> @Model.ProductName</p>
+        </div>
+
+        <div class="bill-items">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>GST</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Model.ProductName</td>
+                        <td>@(Model.TotalAmount / Model.ProductRate)</td>
+                        <td>@Model.ProductRate</td>
+                        <td>@((Model.TotalAmount * 0.18).ToString("0.00"))</td>
+                        <td>@Model.TotalAmount</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bill-total">
+            <p><strong>Total:</strong> @Model.TotalAmount</p>
+            <p><strong>Total (including GST):</strong> @(Model.TotalAmount + Model.TotalAmount * 0.18)</p>
+        </div>
+
+        <div class="qr-code-container">
+            @if (!string.IsNullOrEmpty(Model.QRCodeImage))
+            {
+                <img src="@Model.QRCodeImage" alt="QR Code" />
+            }
+        </div>
+    </div>
+
+    <div class="thank-you-message">
+        <p>Thank You Visit Again!!!</p>
+    </div>
+
+    <div class="print-button">
+        <button id="printButton" onclick="printBill()">Print</button>
+    </div>
+
+    <script>
+        function printBill() {
+            // Hide the print button
+            var printButton = document.getElementById("printButton");
+            printButton.classList.add("hidden");
+
+            // Print the bill
+            window.print();
+        }
+    </script>
+</body>
+</html>

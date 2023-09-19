@@ -1,0 +1,58 @@
+﻿@model List<InvoiceManagementPro.Models.BillView>
+
+@{
+    ViewData["Title"] = "Bill Index";
+}
+
+<div class="row">
+    <div class="col">
+        <h1 style="white-space:nowrap">Bill List</h1>
+    </div>
+    <div class="col text-right" style="padding-left:800px">
+        <a class="btn btn-success" href="@Url.Action("Create")">Create New</a>
+    </div>
+</div>
+
+<table class="table" id="Bill">
+    <thead>
+        <tr>
+            <th style="white-space:nowrap">Customer Name</th>
+            <th style="white-space:nowrap">Total Amount</th>
+            <th style="white-space:nowrap">Bill Created Date</th>
+            <th style="white-space:nowrap">Product Quantity</th>
+            <th style="white-space:nowrap">Product Name</th>
+            <th style="white-space:nowrap">Actions</th>
+            @*<th></th> <!-- QR Code column -->*@
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bill in Model)
+        {
+            <tr>
+                <td>@bill.CustomerName</td>
+                <td>@bill.TotalAmount</td>
+                <td>@bill.BillCreatedDate?.ToString("dd/MM/yyyy")</td>
+                <td>@bill.ProductQuantity</td>
+                <td>@bill.ProductName</td>
+                <td style="white-space:nowrap">
+                    <a class="btn btn-primary" href="@Url.Action("Details", new { id = bill.BillId })">Details</a>
+                    <a class="btn btn-warning" href="@Url.Action("Edit", new { id = bill.BillId })">Edit</a>
+                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = bill.BillId })">Delete</a>
+                    <a class="btn btn-primary" href="@Url.Action("PrintBill", new { id = bill.BillId })">Print</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#Bill').DataTable();
+        });
+    </script>
+}

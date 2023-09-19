@@ -1,0 +1,42 @@
+﻿@model InvoiceManagementPro.Models.BillView
+
+@{
+    ViewData["Title"] = "Delete Bill";
+}
+
+<h1>Delete Bill</h1>
+
+<div class="row">
+    <div class="col">
+        <dl class="row">
+         @*   <dt class="col-sm-2">Bill ID:</dt>*@
+            @*<dd class="col-sm-10">@Model.BillId</dd>*@
+
+            <dt class="col-sm-2">Customer Name:</dt>
+            <dd class="col-sm-10">@Model.CustomerName</dd>
+
+            <dt class="col-sm-2">Total Amount:</dt>
+            <dd class="col-sm-10">@Model.TotalAmount</dd>
+
+            <dt class="col-sm-2">Bill Created Date:</dt>
+            <dd class="col-sm-10">@Model.BillCreatedDate?.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-2">Product Quantity:</dt>
+            <dd class="col-sm-10">@Model.ProductQuantity</dd>
+
+            <dt class="col-sm-2">Product Name:</dt>
+            <dd class="col-sm-10">@Model.ProductName</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <h4>Are you sure you want to delete this bill?</h4>
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="BillId" />
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            <a class="btn btn-secondary" href="@Url.Action("Index")">Cancel</a>
+        </form>
+    </div>
+</div>

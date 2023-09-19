@@ -1,0 +1,25 @@
+﻿@model InvoiceManagementPro.Models.Product
+
+<h1>Product Details</h1>
+
+<div>
+    @*<h4>Product ID: @Model.ProductId</h4>*@
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Product Name:</dt>
+        <dd class="col-sm-10">@Model.ProductName</dd>
+
+        <dt class="col-sm-2">Product Unit:</dt>
+        <dd class="col-sm-10">@Model.ProductUnit</dd>
+
+        <dt class="col-sm-2">Product Rate:</dt>
+        <dd class="col-sm-10">@Model.ProductRate</dd>
+
+        <dt class="col-sm-2">Product Description:</dt>
+        <dd class="col-sm-10">@Model.ProductDescription</dd>
+    </dl>
+</div>
+
+<p>
+    <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
+</p>

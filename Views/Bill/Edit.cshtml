@@ -1,0 +1,38 @@
+﻿@model InvoiceManagementPro.Models.BillView
+
+@{
+    ViewData["Title"] = "Edit Bill";
+}
+
+<h1>Edit Bill</h1>
+
+<form asp-action="Edit">
+    <div class="form-group">
+        <label asp-for="BillId" class="control-label">Bill ID:</label>
+        <input asp-for="BillId" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerId" class="control-label">Customer ID:</label>
+        <input asp-for="CustomerId" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="TotalAmount" class="control-label">Total Amount:</label>
+        <input asp-for="TotalAmount" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="BillCreatedDate" class="control-label">Bill Created Date:</label>
+        <input asp-for="BillCreatedDate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ProductQuantity" class="control-label">Product Quantity:</label>
+        <input asp-for="ProductQuantity" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ProductName" class="control-label">Product Name:</label>
+        <input asp-for="ProductName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        <a class="btn btn-secondary" href="@Url.Action("Index")">Back to List</a>
+    </div>
+</form>

@@ -1,0 +1,49 @@
+﻿@model InvoiceManagementPro.Models.Customer
+
+<h1>Add Customer</h1>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label for="CustomerName">Customer Name:</label>
+        @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerDetail">Customer Detail:</label>
+        @Html.TextBoxFor(m => m.CustomerDetail, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CustomerDetail, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerCity">Customer City:</label>
+        @Html.TextBoxFor(m => m.CustomerCity, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CustomerCity, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="PhoneNumber">Phone Number:</label>
+        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+    </div>
+
+
+    <div class="form-group">
+        <label for="PhoneNumber">Account Number:</label>
+        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.AccountNumber, "", new { @class = "text-danger" })
+    </div>
+
+
+
+    <br />
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
+    </div>
+}
+
+

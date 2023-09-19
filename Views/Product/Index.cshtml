@@ -1,0 +1,52 @@
+﻿@model List<InvoiceManagementPro.Models.Product>
+
+<div class="row">
+    <div class="col">
+        <h1 style="white-space:nowrap">Product List</h1>
+    </div>
+    <div class="col text-right" style="padding-left:935px">
+        <a class="btn btn-success" href="@Url.Action("Create")">Create New</a>
+    </div>
+</div>
+
+<table class="table" id="Product">
+    <thead>
+        <tr>
+           @* <th>Product ID</th>*@
+            <th>Product Name</th>
+            <th>Product Unit</th>
+            <th>Product Rate</th>
+            <th>Product Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                @*<td>@product.ProductId</td>*@
+                <td>@product.ProductName</td>
+                <td>@product.ProductUnit</td>
+                <td>@product.ProductRate</td>
+                <td>@product.ProductDescription</td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Details", new { id = product.ProductId })">Details</a>
+                    <a class="btn btn-warning" href="@Url.Action("Edit", new { id = product.ProductId })">Edit</a>
+                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = product.ProductId })">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#Product').DataTable();
+        });
+    </script>
+}

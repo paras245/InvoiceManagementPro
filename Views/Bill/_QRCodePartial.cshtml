@@ -1,0 +1,26 @@
+﻿@model string
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    #qrCodeContainer {
+        text-align: center;
+    }
+
+        #qrCodeContainer img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+</style>
+
+<div id="qrCodeContainer">
+    @if (!string.IsNullOrEmpty(Model))
+    {
+        <img src="@Model" alt="QR Code" />
+    }
+</div>

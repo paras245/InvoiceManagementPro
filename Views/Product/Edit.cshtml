@@ -1,0 +1,40 @@
+﻿@model InvoiceManagementPro.Models.Product
+
+<h1>Edit Product</h1>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.ProductId)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProductName)
+        @Html.TextBoxFor(model => model.ProductName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ProductName)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProductUnit)
+        @Html.TextBoxFor(model => model.ProductUnit, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ProductUnit)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProductRate)
+        @Html.TextBoxFor(model => model.ProductRate, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ProductRate)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ProductDescription)
+        @Html.TextBoxFor(model => model.ProductDescription, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ProductDescription)
+    </div>
+
+    <br />
+    <div class="form-group">
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+        <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
+    </div>
+}

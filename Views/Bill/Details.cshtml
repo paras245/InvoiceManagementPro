@@ -1,0 +1,62 @@
+﻿@model InvoiceManagementPro.Models.BillView
+
+<div class="row">
+    <div class="col">
+        <h1>Bill Details</h1>
+    </div>
+   @* <div class="col text-right">
+        <a class="btn btn-primary" href="@Url.Action("PrintBill", new { id = Model.BillId })" target="_blank">Print Bill</a>
+    </div>*@
+</div>
+
+<div class="bill-container">
+    <div class="bill-header">
+       @* <h2>Bill</h2>*@
+    </div>
+    <div class="bill-info">
+       @* <p>Bill ID: @Model.BillId</p>*@
+        <p>Customer Name: @Model.CustomerName</p>
+        <p>Total Amount: @Model.TotalAmount</p>
+        <p>Bill Created Date: @Model.BillCreatedDate?.ToString("dd/MM/yyyy")</p>
+        <p>Product Quantity: @Model.ProductQuantity</p>
+        <p>Product Name: @Model.ProductName</p>
+    </div>
+
+    <p>
+        <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
+    </p>
+
+    <!-- Rest of the bill format code -->
+
+    @*<div id="qrCodeContainer">
+        @if (!string.IsNullOrEmpty(Model.QRCodeImage))
+        {
+            <img src="@Model.QRCodeImage" alt="QR Code" />
+        }
+    </div>*@
+</div>
+
+@section Scripts {
+   @* <script>
+        $(document).ready(function () {
+            // Generate QR code
+            generateQRCode();
+        });
+
+        function generateQRCode() {
+            var inputText = '@Model.BillId';
+            $.ajax({
+                url: '@Url.Action("GenerateQRCode", "Bill")',
+                type: 'POST',
+                data: { inputText: inputText },
+                success: function (qrCodeImage) {
+                    $('#qrCodeContainer').html('<img src="' + qrCodeImage + '" alt="QR Code" />');
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.log(error);
+                }
+            });
+        }*@
+    </script>
+}
