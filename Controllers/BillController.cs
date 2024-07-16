@@ -12,12 +12,19 @@ using System.Linq;
 
 namespace InvoiceManagementPro.Controllers
 {
+
+    //Access Modifier ControllerName : InheritedClass
     public class BillController : Controller
     {
+        
+        //Access Modifier  Type 
         private readonly ApplicationDbContext _context;
 
+
+        //Access-Modifier Controller Name 
         public BillController(ApplicationDbContext context)
         {
+            //Dependency Injection
             _context = context;
         }
 

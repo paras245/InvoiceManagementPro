@@ -1,8 +1,12 @@
-﻿using InvoiceManagementPro.Data;
+﻿using ClosedXML.Excel;
+using InvoiceManagementPro.Data;
 using InvoiceManagementPro.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,9 +16,12 @@ namespace InvoiceManagementPro.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductController(ApplicationDbContext context)
+        private IConfiguration _configuration;
+
+        public ProductController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: ProductController
@@ -130,5 +137,49 @@ namespace InvoiceManagementPro.Controllers
         {
             return _context.Product.Any(p => p.ProductId == id);
         }
-    }
+
+
+
+        [HttpPost]
+		public IActionResult Export()
+		{
+			using (XLWorkbook wb = new XLWorkbook())
+			{
+				DataTable dt = this.GetProducts().Tables[0];
+				wb.Worksheets.Add(dt);
+				using (MemoryStream stream = new MemoryStream())
+				{
+					wb.SaveAs(stream);
+                    string FileName = DateTime.Now + "Product.xlsx";
+					return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName);
+				}
+			}
+		}
+
+		private DataSet GetProducts()
+		{
+			DataSet ds = new DataSet();
+
+            string constr = _configuration.GetSection("ConnectionStrings").GetSection("DefaultConnection").Value;
+         	
+            using (SqlConnection con = new SqlConnection(constr))
+			{
+				string query = "SELECT * FROM Product";
+				using (SqlCommand cmd = new SqlCommand(query))
+				{
+					cmd.Connection = con;
+					using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+					{
+						sda.Fill(ds);
+					}
+				}
+			}
+
+			return ds;
+		}
+
+
+
+
+	}
 }

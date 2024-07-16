@@ -1,7 +1,10 @@
-﻿using InvoiceManagementPro.Data;
+﻿using ClosedXML.Excel;
+using InvoiceManagementPro.Data;
 using InvoiceManagementPro.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,9 +14,12 @@ namespace InvoiceManagementPro.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public CustomerController(ApplicationDbContext context)
+        private IConfiguration _configuration;
+
+        public CustomerController(ApplicationDbContext context,IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: Customer
@@ -85,6 +91,9 @@ namespace InvoiceManagementPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Customer customer)
         {
+
+            customer.CustomerId = id;
+
             if (id != customer.CustomerId)
             {
                 return NotFound();
@@ -146,6 +155,44 @@ namespace InvoiceManagementPro.Controllers
         private bool CustomerExists(int id)
         {
             return _context.Customer.Any(c => c.CustomerId == id);
+        }
+
+        [HttpPost]
+        public IActionResult Export()
+        {
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                DataTable dt = this.GetCustomer().Tables[0];
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    string FileName = DateTime.Now + "Customer.xlsx";
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName);
+                }
+            }
+        }
+
+        private DataSet GetCustomer()
+        {
+            DataSet ds = new DataSet();
+
+            string constr = _configuration.GetSection("ConnectionStrings").GetSection("DefaultConnection").Value;
+
+            using (SqlConnection con = new SqlConnection(constr))
+            {
+                string query = "SELECT * FROM Customer";
+                using (SqlCommand cmd = new SqlCommand(query))
+                {
+                    cmd.Connection = con;
+                    using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                    {
+                        sda.Fill(ds);
+                    }
+                }
+            }
+
+            return ds;
         }
     }
 }

@@ -6,12 +6,19 @@
     <div class="col">
         <h1 style="white-space:nowrap">Customer List</h1>
     </div>
-    <div class="col text-right" style="padding-left:925px">
+    <div class="col text-right" style="display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;">
         <a class="btn btn-success" href="@Url.Action("Create")">Create New</a>
+        <form method="post" asp-controller="Customer" asp-action="Export">
+            @* <button class="btn-dark" type="submit" value="Export" /> *@
+            <a class="btn btn-danger" href="@Url.Action("Export")">Export As Excel</a>
+        </form>
     </div>
 </div>
 
-<table class="table" id="Customer">
+<table class="table table-striped border-1" id="Customer">
     <thead>
         <tr>
           @*  <th>Customer ID</th>*@

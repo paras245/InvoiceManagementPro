@@ -8,12 +8,17 @@
     <div class="col">
         <h1 style="white-space:nowrap">Bill List</h1>
     </div>
-    <div class="col text-right" style="padding-left:800px">
+    <div class="col text-right" style="
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-content: flex-start;">
         <a class="btn btn-success" href="@Url.Action("Create")">Create New</a>
     </div>
 </div>
 
-<table class="table" id="Bill">
+<table class="table table-striped border-1" id="Bill">
     <thead>
         <tr>
             <th style="white-space:nowrap">Customer Name</th>
