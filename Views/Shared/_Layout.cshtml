@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InvoiceManagementPro.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <body>
 
@@ -39,7 +40,12 @@
         </nav>
     </header>*@
     <div class="container">
+        <div style="display:flex;flex-direction:row-reverse">
+            <button onclick="turnDarkMode()" title="Turn Dark Mode" style="border:none;background:transparent"><i class="fa fa-moon-o" style="font-size:30px"></i></button>
+            <button onclick="turnLightMode()" title="Turn Light Mode" style="border:none;background:transparent"><i class="fa fa-sun-o" style="font-size:30px;color:red"></i></button>
+        </div>
         <main role="main" class="pb-3">
+            
             @RenderBody()
         </main>
     </div>
@@ -52,6 +58,14 @@
     <script nonce src="~/lib/jquery/dist/jquery.min.js" crossorigin></script>
     <script nonce src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function turnDarkMode() {
+            alert("userClicked Dark mode");
+        }
+        function turnLightMode() {
+            alert("userClicked Light mode");
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
