@@ -2,48 +2,140 @@
 
 <h1>Add Customer</h1>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Create", "Customer", FormMethod.Post, new { id = "customerForm" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-group">
         <label for="CustomerName">Customer Name:</label>
-        @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control" })
+        @Html.TextBoxFor(m => m.CustomerName, new { @class = "form-control", id = "CustomerName" })
         @Html.ValidationMessageFor(m => m.CustomerName, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group">
         <label for="CustomerDetail">Customer Detail:</label>
-        @Html.TextBoxFor(m => m.CustomerDetail, new { @class = "form-control" })
+        @Html.TextBoxFor(m => m.CustomerDetail, new { @class = "form-control", id = "CustomerDetail" })
         @Html.ValidationMessageFor(m => m.CustomerDetail, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group">
         <label for="CustomerCity">Customer City:</label>
-        @Html.TextBoxFor(m => m.CustomerCity, new { @class = "form-control" })
+        @Html.TextBoxFor(m => m.CustomerCity, new { @class = "form-control", id = "CustomerCity" })
         @Html.ValidationMessageFor(m => m.CustomerCity, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group">
         <label for="PhoneNumber">Phone Number:</label>
-        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", id = "PhoneNumber" })
         @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
     </div>
 
-
     <div class="form-group">
-        <label for="PhoneNumber">Account Number:</label>
-        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control" })
+        <label for="AccountNumber">Account Number:</label>
+        @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control", id = "AccountNumber" })
         @Html.ValidationMessageFor(m => m.AccountNumber, "", new { @class = "text-danger" })
     </div>
 
-
-
     <br />
     <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-primary" />
-        <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
+        <button type="button" id="submitBtn" class="btn btn-primary">Save</button>
+        <button type="button" id="backBtn" class="btn btn-success">Back to List</button>
     </div>
 }
 
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        // Function to check form validity and show validation errors
+        function validateForm() {
+            let isValid = true;
+
+            $('#customerForm input[type="text"]').each(function () {
+                let value = $(this).val().trim();
+                let errorMessage = $(this).next('.text-danger');
+
+                if (value === '') {
+                    errorMessage.text("This field is required");
+                    isValid = false;
+                } else {
+                    errorMessage.text("");
+                }
+            });
+
+            return isValid;
+        }
+
+        // Show validation errors dynamically when input changes
+        $('#customerForm input[type="text"]').on('input', function () {
+            validateForm();
+        });
+
+        // Show SweetAlert confirmation before submitting
+        $('#submitBtn').click(function () {
+            if (!validateForm()) {
+                return; // Stop if the form is not valid
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to save this customer?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, save it!",
+                cancelButtonText: "No, cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Simulate form submission via AJAX
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("Create", "Customer")", // Adjust based on your controller
+                        data: $('#customerForm').serialize(),
+                        success: function () {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Your data has been saved successfully!",
+                                icon: "success"
+                            }).then(() => {
+                                window.location.href = "@Url.Action("Index", "Customer")"; // Redirect after success
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Something went wrong. Please try again.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Confirmation before going back
+        $('#backBtn').click(function (event) {
+            event.preventDefault(); // Stop immediate navigation
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Unsaved changes will be lost. Do you want to leave?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, go back",
+                cancelButtonText: "No, stay here"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "@Url.Action("Index", "Customer")"; // Redirect after confirmation
+                }
+            });
+        });
+    });
+</script>
