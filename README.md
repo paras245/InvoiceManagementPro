@@ -95,5 +95,3 @@ Web Developer | Learning .NET & Modern Web Development
 > Every expert was once a beginner — this project marks the start of my journey 🚀
 
 ---
-
-Just say **next** 💪🔥
