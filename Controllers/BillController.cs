@@ -97,6 +97,7 @@ namespace InvoiceManagementPro.Controllers
                 _context.Bill.Add(newBill);
                 _context.SaveChanges();
 
+                TempData["Success"] = "Bill created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -119,6 +120,7 @@ namespace InvoiceManagementPro.Controllers
             {
                 _context.Entry(bill).State = EntityState.Modified;
                 _context.SaveChanges();
+                TempData["Success"] = "Bill updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(bill);
@@ -150,6 +152,7 @@ namespace InvoiceManagementPro.Controllers
             var bill = _context.Bill.Find(id);
             _context.Bill.Remove(bill);
             _context.SaveChanges();
+            TempData["Success"] = "Bill deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
 

@@ -15,10 +15,7 @@
         <h1 class="text-center">Invoice Management System</h1>
     </a>
 
-    
-    <hr />
-    <br />
-   @* <header>
+    <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">InvoiceManagementPro</a>
@@ -34,16 +31,30 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Customers</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Bill" asp-action="Index">Bills</a>
+                        </li>
                     </ul>
+                     <div class="d-flex align-items-center">
+                        <button onclick="setTheme('dark')" class="btn btn-link text-dark p-0 me-2" title="Turn Dark Mode">
+                            <i class="fa fa-moon-o" style="font-size:24px"></i>
+                        </button>
+                        <button onclick="setTheme('light')" class="btn btn-link text-warning p-0" title="Turn Light Mode">
+                            <i class="fa fa-sun-o" style="font-size:24px"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </nav>
-    </header>*@
+    </header>
     <div class="container">
-        <div style="display:flex;flex-direction:row-reverse">
-            <button onclick="turnDarkMode()" title="Turn Dark Mode" style="border:none;background:transparent"><i class="fa fa-moon-o" style="font-size:30px"></i></button>
-            <button onclick="turnLightMode()" title="Turn Light Mode" style="border:none;background:transparent"><i class="fa fa-sun-o" style="font-size:30px;color:red"></i></button>
-        </div>
+        
         <main role="main" class="pb-3">
             
             @RenderBody()
@@ -58,12 +69,50 @@
     <script nonce src="~/lib/jquery/dist/jquery.min.js" crossorigin></script>
     <script nonce src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function turnDarkMode() {
-            alert("userClicked Dark mode");
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
         }
-        function turnLightMode() {
-            alert("userClicked Light mode");
+
+        // Apply saved theme on load
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+
+        // SweetAlert2 Toast Mixin
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // Check for TempData messages
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                Toast.fire({
+                    icon: 'success',
+                    title: '@TempData["Success"]'
+                });
+            </text>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                Toast.fire({
+                    icon: 'error',
+                    title: '@TempData["Error"]'
+                });
+            </text>
         }
     </script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,102 +1,65 @@
 ﻿@model InvoiceManagementPro.Models.Bill
 
 @{
-    ViewBag.Title = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Create Bill";
 }
 
-<h2>Create Bill</h2>
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3" style="background: linear-gradient(45deg, #36b9cc, #2c9faf); color: white;">
+                <h6 class="m-0 font-weight-bold">Create New Bill</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CustomerId" class="form-label fw-bold">Customer</label>
+                            <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(ViewBag.CustomerList, "Value", "Text"))">
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ProductQuantity" class="form-label fw-bold">Product</label>
+                            <select asp-for="ProductQuantity" class="form-select" asp-items="@(new SelectList(ViewBag.ProductList, "Value", "Text"))">
+                                <option value="">-- Select Product --</option>
+                            </select>
+                            <span asp-validation-for="ProductQuantity" class="text-danger"></span>
+                        </div>
+                    </div>
 
-    <div class="form-horizontal">
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Quantity" class="form-label fw-bold">Quantity</label>
+                            <input asp-for="Quantity" class="form-control" placeholder="Enter quantity" type="number" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
 
-        <div class="form-group">
-            <label asp-for="BillCreatedDate" class="control-label col-md-2">Bill Created Date</label>
-            <div class="col-md-10">
-                <input asp-for="BillCreatedDate" class="form-control datepicker" style="width:400px;height:50px;" />
-                <span asp-validation-for="BillCreatedDate" class="text-danger" ></span>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BillCreatedDate" class="form-label fw-bold">Bill Date</label>
+                            <input asp-for="BillCreatedDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="BillCreatedDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-3">
+                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save Bill</button>
+                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <div class="form-group">
-            Customer
-            <div class="col-md-10">
-                @Html.DropDownList("CustomerId", (IEnumerable<SelectListItem>)ViewData["CustomerList"], "--Select Customer--", new { @class = "form-control", style = "width:400px;height:50px;" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            Product
-            <div class="col-md-10">
-                @Html.DropDownList("ProductQuantity", (IEnumerable<SelectListItem>)ViewData["ProductList"], "--Select Product--", new { @class = "form-control", style = "width:400px;height:50px;", onchange = "myFunction()" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            Amount
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.BillAmount, new { @class = "form-control", style = "width:400px;height:50px;" })
-                @Html.ValidationMessageFor(model => model.BillAmount, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            Quantity
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", @required = "required", onchange = "myFunction1()" } })
-            </div>
-        </div>
-
-        <div class="form-group">
-            Total Amount
-            <div class="col-md-10">
-                <p id="TotalAmount" name="TotalAmount" style="font-size: 30px;"></p>
-            </div>
-        </div>
-
-        <br />
-        @*<div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-outline-dark crtBtn" />
-            </div>
-        </div>*@
     </div>
-       
-        <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-primary" />
-            <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
-        </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        // Basic calculations if needed, though most logic should be handled backend or with Vue/React if complex
+        // Keeping it simple for now as per requirements
+    </script>
 }
-
-@*<div style="margin-top:10px">
-    <a class="btn btn-success" href="/Bill/Index">Back to List</a>
-</div>*@
-
-@*@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}*@
-
-<script type="text/javascript">
-    function myFunction() {
-        var x = document.getElementById("ProductQuantity").value;
-        document.getElementById("BillAmount").value = x;
-        document.getElementById("BillAmount").innerHTML = x;
-    }
-
-    function myFunction1() {
-        var x = document.getElementById("ProductQuantity").value;
-        var y = document.getElementById("Quantity").value;
-        document.getElementById("TotalAmount").innerHTML = "Your Total Amount is: " + x * y;
-    }
-    $(function () {
-        $('.datepicker').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true
-        });
-    });
-</script>

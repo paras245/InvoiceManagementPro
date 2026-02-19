@@ -16,7 +16,7 @@ namespace InvoiceManagementPro.Controllers
 
         private IConfiguration _configuration;
 
-        public CustomerController(ApplicationDbContext context,IConfiguration configuration)
+        public CustomerController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -62,6 +62,7 @@ namespace InvoiceManagementPro.Controllers
             {
                 _context.Customer.Add(customer);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Customer created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -91,7 +92,6 @@ namespace InvoiceManagementPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Customer customer)
         {
-
             customer.CustomerId = id;
 
             if (id != customer.CustomerId)
@@ -117,6 +117,7 @@ namespace InvoiceManagementPro.Controllers
                         throw;
                     }
                 }
+                TempData["Success"] = "Customer updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -149,6 +150,7 @@ namespace InvoiceManagementPro.Controllers
             var customer = await _context.Customer.FirstOrDefaultAsync(c => c.CustomerId == id);
             _context.Customer.Remove(customer);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Customer deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
 

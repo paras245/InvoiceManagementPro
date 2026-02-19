@@ -2,45 +2,59 @@
     ViewBag.Title = "Home Page";
 }
 
-
-
-<script src="https://www.w3schools.com/lib/w3.js"></script>
-
-<div class="row col-lg-12">
-        <img  class="nature" src="~/Images/Img1.jpg" width="100%" style="margin-left:0px;height:500px">
-        <img class="nature" src="~/Images/Img2.jpg" width="100%" style="margin-left: 0px; height: 500px">
-        <img class="nature" src="~/Images/Img3.png" width="100%" style="margin-left: 0px; height: 500px">    
+<div class="hero-section">
+    <div class="container">
+        <h1>Streamline Your Business Finances</h1>
+        <p>Manage Invoices, Customers, and Products with ease and efficiency.</p>
+        <a href="@Url.Action("Index", "Bill")" class="btn btn-hero">Manage Invoices</a>
+    </div>
 </div>
 
-<div class="main-text col-lg-12">
-    <p style="margin-top:150px">
-        It’s essential for companies to have a tight invoice management process because suppliers and vendors
-        don’t appreciate not getting paid in a timely manner. Further, accidentally paying a vendor twice for a
-        six-figure contract is probably not going to go over very well with your head of finance. Good invoice management
-        is accountability in action for money going in and out of your company.
-
-    </p>
-</div>
-
-<br />
-
-<hr />
-<div class="container" style="margin-left:150px">
-    <div class="row">
-        <div class="col">
-            <a class="btn btn-dark" href="~/Product/Index" role="button">Product</a>
+<div class="container mb-5">
+    <div class="row g-4">
+        <!-- Product Card -->
+        <div class="col-md-4">
+            <a href="@Url.Action("Index", "Product")" style="text-decoration:none">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa fa-cubes"></i>
+                    </div>
+                    <h3 class="feature-title">Products</h3>
+                    <p class="feature-desc">Manage your product inventory, set rates, and track stock effortlessly.</p>
+                    <span class="btn btn-outline-primary rounded-pill">Manage Products</span>
+                </div>
+            </a>
         </div>
-        <div class="col">
-            <a class="btn btn-dark" href="~/Customer/Index" role="button">Customer</a>
+
+        <!-- Customer Card -->
+        <div class="col-md-4">
+            <a href="@Url.Action("Index", "Customer")" style="text-decoration:none">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Customers</h3>
+                    <p class="feature-desc">Keep track of your client details and communication history in one place.</p>
+                    <span class="btn btn-outline-primary rounded-pill">Manage Customers</span>
+                </div>
+            </a>
         </div>
-        <div class="col">
-            <a class="btn btn-dark" href="~/Bill/Index" role="button">Bill</a>
+
+        <!-- Bill Card -->
+        <div class="col-md-4">
+            <a href="@Url.Action("Index", "Bill")" style="text-decoration:none">
+                <div class="feature-card">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa fa-file-text-o"></i>
+                    </div>
+                    <h3 class="feature-title">Bills & Invoices</h3>
+                    <p class="feature-desc">Generate professional invoices and track payments with ease.</p>
+                    <span class="btn btn-outline-primary rounded-pill">Manage Bills</span>
+                </div>
+            </a>
         </div>
     </div>
 </div>
-<script>
-    w3.slideshow(".nature", 5000);
-</script>
 
 
 

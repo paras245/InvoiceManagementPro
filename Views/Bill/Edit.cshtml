@@ -1,38 +1,52 @@
-﻿@model InvoiceManagementPro.Models.BillView
+﻿@model InvoiceManagementPro.Models.Bill
 
 @{
     ViewData["Title"] = "Edit Bill";
 }
 
-<h1>Edit Bill</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3" style="background: linear-gradient(45deg, #36b9cc, #2c9faf); color: white;">
+                <h6 class="m-0 font-weight-bold">Edit Bill</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="BillId" />
+                    <input type="hidden" asp-for="CustomerId" />
+                    <input type="hidden" asp-for="ProductQuantity" />
+                    <input type="hidden" asp-for="BillCreatedDate" />
 
-<form asp-action="Edit">
-    <div class="form-group">
-        <label asp-for="BillId" class="control-label">Bill ID:</label>
-        <input asp-for="BillId" class="form-control" readonly />
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i> Editing limited fields. To change Customer or Product, please delete and create a new bill.
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Quantity" class="form-label fw-bold">Quantity</label>
+                        <input asp-for="Quantity" class="form-control" type="number" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TotalAmount" class="form-label fw-bold">Total Amount</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-light fw-bold">AED</span>
+                             <input asp-for="TotalAmount" class="form-control" readonly />
+                        </div>
+                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="submit" class="btn btn-warning text-white"><i class="fa fa-save"></i> Save Changes</button>
+                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="CustomerId" class="control-label">Customer ID:</label>
-        <input asp-for="CustomerId" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="TotalAmount" class="control-label">Total Amount:</label>
-        <input asp-for="TotalAmount" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="BillCreatedDate" class="control-label">Bill Created Date:</label>
-        <input asp-for="BillCreatedDate" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ProductQuantity" class="control-label">Product Quantity:</label>
-        <input asp-for="ProductQuantity" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ProductName" class="control-label">Product Name:</label>
-        <input asp-for="ProductName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-primary" />
-        <a class="btn btn-secondary" href="@Url.Action("Index")">Back to List</a>
-    </div>
-</form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,64 +1,98 @@
 ﻿@model List<InvoiceManagementPro.Models.Product>
 
-<div class="row">
-    <div class="col">
-        <h1 style="white-space:nowrap">Product List</h1>
-    </div>
-    <div class="col text-right myCustomFlexClass" style="display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    flex-direction: row;">
-        <a class="btn btn-success" href="@Url.Action("Create")">Create New</a>
-        <form method="post" asp-controller="Product" asp-action="Export">
-            @* <button class="btn-dark" type="submit" value="Export" /> *@
-            <a class="btn btn-danger" href="@Url.Action("Export")">Export As Excel</a>
-        </form>
+@{
+    ViewData["Title"] = "Product List";
+}
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background: linear-gradient(45deg, #4e73df, #224abe); color: white;">
+            <h6 class="m-0 font-weight-bold text-white">Product List</h6>
+            <div class="d-flex align-items-center">
+                <a class="btn btn-light btn-sm me-2 text-primary fw-bold" href="@Url.Action("Create")">
+                    <i class="fa fa-plus"></i> Create New
+                </a>
+                <form method="post" asp-controller="Product" asp-action="Export" class="d-inline">
+                     <button class="btn btn-light btn-sm text-danger fw-bold" type="submit">
+                         <i class="fa fa-file-excel-o"></i> Export
+                     </button>
+                </form>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover" id="Product" width="100%" cellspacing="0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Unit</th>
+                            <th>Rate</th>
+                            <th>Description</th>
+                            <th class="text-center" style="width: 150px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model)
+                        {
+                            <tr>
+                                <td class="align-middle">@product.ProductName</td>
+                                <td class="align-middle">@product.ProductUnit</td>
+                                <td class="align-middle">@product.ProductRate</td>
+                                <td class="align-middle">@product.ProductDescription</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a class="btn btn-info btn-sm text-white" href="@Url.Action("Details", new { id = product.ProductId })" title="Details">
+                                            <i class="fa fa-info-circle"></i>
+                                        </a>
+                                        <a class="btn btn-warning btn-sm text-white" href="@Url.Action("Edit", new { id = product.ProductId })" title="Edit">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('@Url.Action("Delete", new { id = product.ProductId })')" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-
-<table class="table table-striped border-1" id="Product">
-    <thead>
-        <tr>
-           @* <th>Product ID</th>*@
-            <th>Product Name</th>
-            <th>Product Unit</th>
-            <th>Product Rate</th>
-            <th>Product Description</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
-        {
-            <tr>
-                @*<td>@product.ProductId</td>*@
-                <td>@product.ProductName</td>
-                <td>@product.ProductUnit</td>
-                <td>@product.ProductRate</td>
-                <td>@product.ProductDescription</td>
-                <td>
-                    <a class="btn btn-primary" href="@Url.Action("Details", new { id = product.ProductId })">Details</a>
-                    <a class="btn btn-warning" href="@Url.Action("Edit", new { id = product.ProductId })">Edit</a>
-                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = product.ProductId })">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-
-
-
-
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
-
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" />
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
         $(document).ready(function () {
-            $('#Product').DataTable();
+            $('#Product').DataTable({
+                "pageLength": 10,
+                "language": {
+                    "paginate": {
+                        "previous": "<i class='fa fa-angle-left'></i>",
+                        "next": "<i class='fa fa-angle-right'></i>"
+                    }
+                }
+            });
         });
+
+        function confirmDelete(url) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
     </script>
 }

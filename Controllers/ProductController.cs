@@ -57,6 +57,7 @@ namespace InvoiceManagementPro.Controllers
             {
                 _context.Product.Add(product);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Product created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -101,6 +102,7 @@ namespace InvoiceManagementPro.Controllers
                         throw;
                     }
                 }
+                TempData["Success"] = "Product updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -130,6 +132,7 @@ namespace InvoiceManagementPro.Controllers
 
             _context.Product.Remove(product);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Product deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -138,48 +141,42 @@ namespace InvoiceManagementPro.Controllers
             return _context.Product.Any(p => p.ProductId == id);
         }
 
-
-
         [HttpPost]
-		public IActionResult Export()
-		{
-			using (XLWorkbook wb = new XLWorkbook())
-			{
-				DataTable dt = this.GetProducts().Tables[0];
-				wb.Worksheets.Add(dt);
-				using (MemoryStream stream = new MemoryStream())
-				{
-					wb.SaveAs(stream);
+        public IActionResult Export()
+        {
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                DataTable dt = this.GetProducts().Tables[0];
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
                     string FileName = DateTime.Now + "Product.xlsx";
-					return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName);
-				}
-			}
-		}
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", FileName);
+                }
+            }
+        }
 
-		private DataSet GetProducts()
-		{
-			DataSet ds = new DataSet();
+        private DataSet GetProducts()
+        {
+            DataSet ds = new DataSet();
 
             string constr = _configuration.GetSection("ConnectionStrings").GetSection("DefaultConnection").Value;
-         	
+            
             using (SqlConnection con = new SqlConnection(constr))
-			{
-				string query = "SELECT * FROM Product";
-				using (SqlCommand cmd = new SqlCommand(query))
-				{
-					cmd.Connection = con;
-					using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
-					{
-						sda.Fill(ds);
-					}
-				}
-			}
+            {
+                string query = "SELECT * FROM Product";
+                using (SqlCommand cmd = new SqlCommand(query))
+                {
+                    cmd.Connection = con;
+                    using (SqlDataAdapter sda = new SqlDataAdapter(cmd))
+                    {
+                        sda.Fill(ds);
+                    }
+                }
+            }
 
-			return ds;
-		}
-
-
-
-
-	}
+            return ds;
+        }
+    }
 }
