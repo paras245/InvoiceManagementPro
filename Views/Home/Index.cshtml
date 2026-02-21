@@ -1,60 +1,296 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewData["Title"] = "Dashboard Overview";
+    
+    // Casting from ViewBag
+    var totalProducts = ViewBag.TotalProducts ?? 0;
+    var totalCustomers = ViewBag.TotalCustomers ?? 0;
+    var totalInvoices = ViewBag.TotalInvoices ?? 0;
+    var totalRevenue = ViewBag.TotalRevenue ?? 0m;
+    
+    var recentInvoices = ViewBag.RecentInvoices as List<InvoiceManagementPro.Models.Bill> ?? new List<InvoiceManagementPro.Models.Bill>();
+    var recentCustomers = ViewBag.RecentCustomers as List<InvoiceManagementPro.Models.Customer> ?? new List<InvoiceManagementPro.Models.Customer>();
 }
 
-<div class="hero-section">
-    <div class="container">
-        <h1>Streamline Your Business Finances</h1>
-        <p>Manage Invoices, Customers, and Products with ease and efficiency.</p>
-        <a href="@Url.Action("Index", "Bill")" class="btn btn-hero">Manage Invoices</a>
+<!-- Top Metrics Row -->
+<div class="row g-4 mb-4">
+    <!-- Revenue -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dash-card">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-primary me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div>
+                    <div class="metric-label">Net Revenue</div>
+                    <div class="metric-value">@totalRevenue.ToString("C")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customers -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dash-card">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-success me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <div class="metric-label">Total Customers</div>
+                    <div class="metric-value">@totalCustomers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dash-card">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-warning me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+                <div>
+                    <div class="metric-label">Available Products</div>
+                    <div class="metric-value">@totalProducts</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoices -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dash-card">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle d-flex align-items-center justify-content-center bg-light text-info me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+                <div>
+                    <div class="metric-label">Total Invoices</div>
+                    <div class="metric-value">@totalInvoices</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="container mb-5">
-    <div class="row g-4">
-        <!-- Product Card -->
-        <div class="col-md-4">
-            <a href="@Url.Action("Index", "Product")" style="text-decoration:none">
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa fa-cubes"></i>
-                    </div>
-                    <h3 class="feature-title">Products</h3>
-                    <p class="feature-desc">Manage your product inventory, set rates, and track stock effortlessly.</p>
-                    <span class="btn btn-outline-primary rounded-pill">Manage Products</span>
-                </div>
-            </a>
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-8">
+        <div class="dash-card d-flex flex-column">
+            <div class="dash-card-header">
+                <h3 class="dash-card-title">Revenue Overview</h3>
+                <select class="form-select form-select-sm" style="width: auto;">
+                    <option>Last 30 Days</option>
+                    <option>This Year</option>
+                </select>
+            </div>
+            <div class="flex-grow-1" style="position: relative; height: 300px;">
+                <canvas id="revenueChart"></canvas>
+            </div>
         </div>
-
-        <!-- Customer Card -->
-        <div class="col-md-4">
-            <a href="@Url.Action("Index", "Customer")" style="text-decoration:none">
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa fa-users"></i>
-                    </div>
-                    <h3 class="feature-title">Customers</h3>
-                    <p class="feature-desc">Keep track of your client details and communication history in one place.</p>
-                    <span class="btn btn-outline-primary rounded-pill">Manage Customers</span>
+    </div>
+    <div class="col-12 col-lg-4">
+        <div class="dash-card d-flex flex-column">
+            <div class="dash-card-header">
+                <h3 class="dash-card-title">Retention Rate</h3>
+                <i class="fa-solid fa-circle-info text-muted"></i>
+            </div>
+            <div class="flex-grow-1 d-flex flex-column justify-content-center align-items-center" style="position: relative; height: 300px;">
+                <canvas id="retentionChart" style="max-height: 200px;"></canvas>
+                <div class="mt-3 text-center">
+                    <span class="fs-4 fw-bold">85%</span>
+                    <p class="text-muted mb-0" style="font-size:0.85rem">Active Users</p>
                 </div>
-            </a>
-        </div>
-
-        <!-- Bill Card -->
-        <div class="col-md-4">
-            <a href="@Url.Action("Index", "Bill")" style="text-decoration:none">
-                <div class="feature-card">
-                    <div class="feature-icon-wrapper">
-                        <i class="fa fa-file-text-o"></i>
-                    </div>
-                    <h3 class="feature-title">Bills & Invoices</h3>
-                    <p class="feature-desc">Generate professional invoices and track payments with ease.</p>
-                    <span class="btn btn-outline-primary rounded-pill">Manage Bills</span>
-                </div>
-            </a>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Lists Row -->
+<div class="row g-4">
+    <!-- Recent Invoices List -->
+    <div class="col-12 col-xl-8">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3 class="dash-card-title">Recent Invoices</h3>
+                <button class="btn btn-sm btn-light"><i class="fa-solid fa-ellipsis"></i></button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead class="text-muted" style="border-bottom: 2px solid var(--border-color); font-size:0.85rem; text-transform:uppercase;">
+                        <tr>
+                            <th class="fw-semibold">Invoice No</th>
+                            <th class="fw-semibold">Date</th>
+                            <th class="fw-semibold">Amount</th>
+                            <th class="fw-semibold text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (recentInvoices.Any())
+                        {
+                            foreach (var inv in recentInvoices)
+                            {
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check me-2">
+                                                <input class="form-check-input" type="checkbox" value="">
+                                            </div>
+                                            <span class="text-primary fw-medium">#INV-@inv.BillId</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-muted">@inv.BillCreatedDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3 fw-semibold">@inv.TotalAmount.ToString("C")</td>
+                                    <td class="py-3 text-end">
+                                        <a href="@Url.Action("PrintBill", "Bill", new { id = inv.BillId })" class="btn btn-sm btn-light text-muted me-1" title="Download"><i class="fa-solid fa-download"></i></a>
+                                        <a href="@Url.Action("Details", "Bill", new { id = inv.BillId })" class="btn btn-sm btn-light text-muted" title="View"><i class="fa-solid fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No recent invoices found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
+    <!-- Recent Customers Sidebar List -->
+    <div class="col-12 col-xl-4">
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h3 class="dash-card-title">Recent Customers</h3>
+            </div>
+            <div class="customer-list mt-2">
+                @if (recentCustomers.Any())
+                {
+                    foreach (var cust in recentCustomers)
+                    {
+                        <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded" style="background-color: var(--main-bg);">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 font-weight-bold" style="width:40px;height:40px;">
+                                    @cust.CustomerName.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold" style="font-size:0.95rem;">@cust.CustomerName</h6>
+                                    <small class="text-muted">@cust.CustomerCity</small>
+                                </div>
+                            </div>
+                            <div>
+                                <a href="@Url.Action("Details", "Customer", new { id = cust.CustomerId })" class="btn btn-sm custom-btn-icon"><i class="fa-solid fa-chevron-right text-muted"></i></a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-center text-muted">No recent customers.</p>
+                }
+            </div>
+            
+            <div class="mt-4 p-4 rounded text-white" style="background: linear-gradient(135deg, #FFD166, #4ECD9D);">
+                <h5 class="fw-bold mb-2">Used space</h5>
+                <p class="mb-3" style="font-size: 0.9rem; opacity:0.9;">Your team has used 80% of your available space. Need more?</p>
+                <div class="progress" style="height: 6px; background-color: rgba(255,255,255,0.3);">
+                    <div class="progress-bar bg-white" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+@section Scripts {
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Check theme to set chart colors
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            const textColor = isDark ? '#A0AEC0' : '#858796';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+            // 1. Line Chart (Revenue Overview)
+            const revCtx = document.getElementById('revenueChart').getContext('2d');
+            
+            // Create Gradient
+            const gradient = revCtx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(67, 24, 255, 0.4)');
+            gradient.addColorStop(1, 'rgba(67, 24, 255, 0.0)');
+
+            new Chart(revCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [1500, 2300, 3400, 2900, 4100, 3800, 5200, 4800, 6100, 5500, 7200, 8000],
+                            borderColor: '#4318FF',
+                            backgroundColor: gradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [1000, 1800, 2000, 1900, 2500, 2200, 3000, 2800, 3500, 3200, 4000, 4500],
+                            borderColor: '#A3AED1',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor, drawBorder: false },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+
+            // 2. Doughnut Chart (Retention)
+            const retCtx = document.getElementById('retentionChart').getContext('2d');
+            new Chart(retCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active', 'Churned'],
+                    datasets: [{
+                        data: [85, 15],
+                        backgroundColor: ['#4318FF', '#E2E8F0'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+}

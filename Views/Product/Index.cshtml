@@ -4,60 +4,89 @@
     ViewData["Title"] = "Product List";
 }
 
-<div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background: linear-gradient(45deg, #4e73df, #224abe); color: white;">
-            <h6 class="m-0 font-weight-bold text-white">Product List</h6>
-            <div class="d-flex align-items-center">
-                <a class="btn btn-light btn-sm me-2 text-primary fw-bold" href="@Url.Action("Create")">
-                    <i class="fa fa-plus"></i> Create New
-                </a>
-                <form method="post" asp-controller="Product" asp-action="Export" class="d-inline">
-                     <button class="btn btn-light btn-sm text-danger fw-bold" type="submit">
-                         <i class="fa fa-file-excel-o"></i> Export
-                     </button>
-                </form>
-            </div>
+<div class="dash-card">
+    <div class="dash-card-header mb-4">
+        <h3 class="dash-card-title m-0">Products</h3>
+        <div class="d-flex gap-2">
+            <a class="btn btn-primary btn-sm fw-semibold" href="@Url.Action("Create")">
+                <i class="fa fa-plus me-1"></i> Add Product
+            </a>
+            <form method="post" asp-controller="Product" asp-action="Export" class="m-0">
+                 <button class="btn btn-light btn-sm fw-semibold border" type="submit">
+                     <i class="fa fa-download me-1"></i> Export
+                 </button>
+            </form>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-hover" id="Product" width="100%" cellspacing="0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Name</th>
-                            <th>Unit</th>
-                            <th>Rate</th>
-                            <th>Description</th>
-                            <th class="text-center" style="width: 150px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var product in Model)
-                        {
-                            <tr>
-                                <td class="align-middle">@product.ProductName</td>
-                                <td class="align-middle">@product.ProductUnit</td>
-                                <td class="align-middle">@product.ProductRate</td>
-                                <td class="align-middle">@product.ProductDescription</td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a class="btn btn-info btn-sm text-white" href="@Url.Action("Details", new { id = product.ProductId })" title="Details">
-                                            <i class="fa fa-info-circle"></i>
-                                        </a>
-                                        <a class="btn btn-warning btn-sm text-white" href="@Url.Action("Edit", new { id = product.ProductId })" title="Edit">
-                                            <i class="fa fa-pencil"></i>
-                                        </a>
-                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('@Url.Action("Delete", new { id = product.ProductId })')" title="Delete">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="Product" width="100%" cellspacing="0">
+            <thead class="bg-light text-muted" style="font-size:0.85rem; text-transform:uppercase;">
+                <tr>
+                    <th style="width: 60px;">Image</th>
+                    <th>Product Details</th>
+                    <th>Category</th>
+                    <th>Pricing</th>
+                    <th>Status</th>
+                    <th class="text-end" style="width: 120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td>
+                            <div style="width: 48px; height: 48px; border-radius: 8px; overflow: hidden; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                                @if (!string.IsNullOrEmpty(product.ImagePath1))
+                                {
+                                    <img src="@product.ImagePath1" alt="@product.ProductName" style="width: 100%; height: 100%; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-box text-muted" style="font-size: 1.2rem;"></i>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark mb-1">@product.ProductName</div>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">@product.ProductDescription</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2">@(string.IsNullOrEmpty(product.Category) ? "Uncategorized" : product.Category)</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">AED @product.ProductRate.ToString("N2")</div>
+                            <small class="text-muted">per @product.ProductUnit</small>
+                        </td>
+                        <td>
+                            @if (product.Status == "Active")
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Active</span>
+                            }
+                            else if (product.Status == "Inactive")
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Inactive</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2">@product.Status</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-light text-primary me-1" href="@Url.Action("Details", new { id = product.ProductId })" title="Details">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-light text-warning me-1" href="@Url.Action("Edit", new { id = product.ProductId })" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-light text-danger" onclick="confirmDelete('@Url.Action("Delete", new { id = product.ProductId })')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -70,27 +99,47 @@
         $(document).ready(function () {
             $('#Product').DataTable({
                 "pageLength": 10,
+                "ordering": false, /* Better for custom layouts, optionally enable */
                 "language": {
+                    "search": "",
+                    "searchPlaceholder": "Search products...",
                     "paginate": {
-                        "previous": "<i class='fa fa-angle-left'></i>",
-                        "next": "<i class='fa fa-angle-right'></i>"
+                        "previous": "Prev",
+                        "next": "Next"
                     }
-                }
+                },
+                "dom": '<"row align-items-center mb-3"<"col-md-6"l><"col-md-6"f>>rt<"row align-items-center mt-3"<"col-md-6"i><"col-md-6"p>>'
             });
+            
+            $('.dataTables_filter input').addClass('form-control form-control-sm border');
+            $('.dataTables_length select').addClass('form-select form-select-sm border');
         });
 
+        // Use custom SweetAlert2 for Delete Form Post since Controller uses POST
         function confirmDelete(url) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Delete Product?',
+                text: "This action cannot be undone, and associated images will be deleted.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#e3342f',
+                cancelButtonColor: '#858796',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = url;
+                    // Create a form dynamically to POST to the delete action
+                    var form = document.createElement("form");
+                    form.setAttribute("method", "post");
+                    form.setAttribute("action", url);
+                    
+                    // Add AntiForgeryToken if needed (usually required in ASP.NET Core POSTs)
+                    var antiforgery = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if(antiforgery) {
+                        form.appendChild(antiforgery.cloneNode(true));
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             })
         }

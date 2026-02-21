@@ -1,62 +1,299 @@
-﻿@model InvoiceManagementPro.Models.BillView
+﻿@model InvoiceManagementPro.Models.BillPrintViewModel
 
-<div class="row">
-    <div class="col">
-        <h1>Bill Details</h1>
-    </div>
-   @* <div class="col text-right">
-        <a class="btn btn-primary" href="@Url.Action("PrintBill", new { id = Model.BillId })" target="_blank">Print Bill</a>
-    </div>*@
-</div>
-
-<div class="bill-container">
-    <div class="bill-header">
-       @* <h2>Bill</h2>*@
-    </div>
-    <div class="bill-info">
-       @* <p>Bill ID: @Model.BillId</p>*@
-        <p>Customer Name: @Model.CustomerName</p>
-        <p>Total Amount: @Model.TotalAmount</p>
-        <p>Bill Created Date: @Model.BillCreatedDate?.ToString("dd/MM/yyyy")</p>
-        <p>Product Quantity: @Model.ProductQuantity</p>
-        <p>Product Name: @Model.ProductName</p>
-    </div>
-
-    <p>
-        <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
-    </p>
-
-    <!-- Rest of the bill format code -->
-
-    @*<div id="qrCodeContainer">
-        @if (!string.IsNullOrEmpty(Model.QRCodeImage))
-        {
-            <img src="@Model.QRCodeImage" alt="QR Code" />
-        }
-    </div>*@
-</div>
-
-@section Scripts {
-   @* <script>
-        $(document).ready(function () {
-            // Generate QR code
-            generateQRCode();
-        });
-
-        function generateQRCode() {
-            var inputText = '@Model.BillId';
-            $.ajax({
-                url: '@Url.Action("GenerateQRCode", "Bill")',
-                type: 'POST',
-                data: { inputText: inputText },
-                success: function (qrCodeImage) {
-                    $('#qrCodeContainer').html('<img src="' + qrCodeImage + '" alt="QR Code" />');
-                },
-                error: function (xhr, status, error) {
-                    // Handle error
-                    console.log(error);
-                }
-            });
-        }*@
-    </script>
+@{
+    ViewData["Title"] = $"Invoice {Model.Invoice.InvoiceNumber}";
+    Layout = "_Layout"; // Keep layout, but users can use browser print to isolate it if needed
 }
+
+<style>
+    /* Print Specific Overrides */
+    @@media print {
+        body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .sidebar, .top-navbar, .theme-switch-wrapper, .btn-print-hide { display: none !important; }
+        .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; }
+        #invoice-container { box-shadow: none !important; margin: 0 !important; padding: 0 !important; max-width: 100% !important;}
+        .page-break-inside-avoid { break-inside: avoid; page-break-inside: avoid; }
+    }
+
+    .invoice-wrapper {
+        background: #fff;
+        max-width: 900px;
+        margin: 0 auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+        color: #333;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .inv-header-curve {
+        background: linear-gradient(135deg, #0099ff 0%, #0055ff 100%);
+        color: white;
+        padding: 40px 40px 60px 40px;
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+    }
+
+    .inv-footer-curve {
+        background: linear-gradient(135deg, #0099ff 0%, #0055ff 100%);
+        color: white;
+        padding: 40px;
+        clip-path: polygon(0 25%, 100% 0, 100% 100%, 0 100%);
+        margin-top: 30px;
+    }
+
+    .table-inv {
+        width: 100%;
+        margin-top: 20px;
+    }
+    
+    .table-inv th {
+        background-color: #2F80ED;
+        color: white;
+        padding: 12px;
+        font-weight: 500;
+        text-align: center;
+        border: none;
+    }
+    
+    .table-inv th:first-child { text-align: left; }
+    .table-inv th:last-child { text-align: right; }
+
+    .table-inv td {
+        padding: 15px 12px;
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+    .table-inv td:first-child { text-align: left; }
+    .table-inv td:last-child { text-align: right; }
+
+    .inv-summary-row {
+        background-color: #2F80ED !important;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .inv-summary-row td {
+        border: none !important;
+        padding: 12px !important;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #111;
+    }
+
+    .billing-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #444;
+    }
+</style>
+
+<!-- Controls -->
+<div class="d-flex justify-content-end mb-3 gap-2 btn-print-hide max-w-900 mx-auto" style="max-width: 900px;">
+    <a asp-action="Index" class="btn btn-light border fw-semibold"><i class="fa-solid fa-arrow-left me-1"></i> Back</a>
+    <button onclick="window.print()" class="btn btn-primary fw-semibold"><i class="fa-solid fa-print me-1"></i> Print / Save PDF</button>
+</div>
+
+<!-- Invoice Document -->
+<div class="invoice-wrapper" id="invoice-container">
+    
+    <!-- Header -->
+    <div class="inv-header-curve d-flex justify-content-between align-items-start">
+        <div style="margin-top: -10px;">
+            <!-- Dummy Logo matching the Reference -->
+            <div class="d-flex align-items-center bg-white rounded p-2 mb-2 d-inline-flex">
+                 <div style="width:20px; height:20px; background:#4318FF; border-radius:50%; margin-right:5px;"></div>
+                 <div style="width:12px; height:12px; background:#FF6B6B; border-radius:50%;"></div>
+            </div>
+            <h2 class="m-0 fw-bold" style="color: #111; text-shadow: 0 0 10px rgba(255,255,255,0.8);">PARAS PANCHAL</h2>
+            <div class="text-white mt-1 fw-medium" style="opacity:0.9;">Software Developer | .Net Angular Full-Stack Engineer</div>
+        </div>
+        <div class="text-end">
+            <h1 class="fw-bold m-0 tracking-wide">@Model.Invoice.InvoiceNumber</h1>
+            <div class="mt-1" style="font-size: 1.1rem;">Date : @Model.Invoice.BillCreatedDate.ToString("dd-MMM-yyyy")</div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="px-5 pt-3">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="section-title">Bill to</div>
+                <div class="billing-text">
+                    <strong>@Model.Customer.CustomerName</strong><br />
+                    @(string.IsNullOrEmpty(Model.Customer.BillingAddress) ? "Address Not Provided" : Model.Customer.BillingAddress)<br />
+                    @Model.Customer.CustomerCity, @Model.Customer.State @Model.Customer.ZipCode<br />
+                    <strong>GSTIN:</strong> @(string.IsNullOrEmpty(Model.Customer.GSTIN) ? "N/A" : Model.Customer.GSTIN)
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="section-title">Shipping to</div>
+                <div class="billing-text">
+                    <strong>@Model.Customer.CustomerName</strong><br />
+                    @(string.IsNullOrEmpty(Model.Customer.ShippingAddress) ? (string.IsNullOrEmpty(Model.Customer.BillingAddress) ? "Same as Billing" : Model.Customer.BillingAddress) : Model.Customer.ShippingAddress)<br />
+                    @Model.Customer.CustomerCity, @Model.Customer.State @Model.Customer.ZipCode<br />
+                     <strong>GSTIN:</strong> @(string.IsNullOrEmpty(Model.Customer.GSTIN) ? "N/A" : Model.Customer.GSTIN)
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="section-title">Additional Details</div>
+                <div class="billing-text">
+                    <strong>PO Bill No:</strong> @(string.IsNullOrEmpty(Model.Invoice.POBillNo) ? "N/A" : Model.Invoice.POBillNo)<br />
+                    <strong>E-way Bill No:</strong> @(string.IsNullOrEmpty(Model.Invoice.EwayBillNo) ? "N/A" : Model.Invoice.EwayBillNo)<br />
+                    <strong>Vehicle No:</strong> @(string.IsNullOrEmpty(Model.Invoice.VehicleNo) ? "N/A" : Model.Invoice.VehicleNo)
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <table class="table-inv mt-4">
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th>HSN</th>
+                    <th>Qty</th>
+                    <th>Item Rate</th>
+                    <th>Discount</th>
+                    <th>Tax</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Model.Invoice.BillItems)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if(!string.IsNullOrEmpty(item.Product.ImagePath1))
+                                {
+                                    <img src="@item.Product.ImagePath1" alt="Product" style="width:40px; height:40px; object-fit:cover; margin-right:12px; border:1px solid #ddd; padding:2px; background:#fff;" />
+                                }
+                                <div>
+                                    <div class="fw-bold text-dark">@item.Product.ProductName</div>
+                                    <div style="font-size:0.8rem; color:#666;">@item.Product.Category</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(item.HSNCode) ? "845011" : item.HSNCode)</td>
+                        <td>
+                            <div class="fw-bold">@item.Quantity</div>
+                            <div style="font-size:0.75rem; color:#888;">@item.Product.ProductUnit</div>
+                        </td>
+                        <td>₹@item.ItemRate.ToString("0.00")</td>
+                        <td>
+                            <div>₹@item.DiscountAmount.ToString("0.00")</div>
+                            <div style="font-size:0.75rem; color:#888;">@item.DiscountPercentage.ToString("0.##")%</div>
+                        </td>
+                        <td>
+                            <div>₹@item.TaxAmount.ToString("0.00")</div>
+                            <div style="font-size:0.75rem; color:#888;">@item.TaxPercentage.ToString("0.##")%</div>
+                        </td>
+                        <td class="fw-bold text-dark">₹@item.LineTotal.ToString("0.00")</td>
+                    </tr>
+                }
+                
+                <tr class="inv-summary-row page-break-inside-avoid">
+                    <td colspan="2" class="text-center" style="font-size: 1.1rem;">Total</td>
+                    <td>@Model.Invoice.BillItems.Sum(x => x.Quantity)</td>
+                    <td>₹@Model.Invoice.BillItems.Sum(x => x.ItemRate * x.Quantity).ToString("0.00")</td>
+                    <td>₹@Model.Invoice.TotalDiscount.ToString("0.00")</td>
+                    <td>₹@Model.Invoice.TotalTax.ToString("0.00")</td>
+                    <td>₹@Model.Invoice.GrandTotalAmount.ToString("0.00")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Footer Segments -->
+        <div class="row mt-5 page-break-inside-avoid">
+            <div class="col-md-6">
+                <div class="section-title">Bank Details</div>
+                <table style="font-size:0.9rem; color:#444;" class="mb-3">
+                    <tr>
+                        <td class="fw-bold pe-3 pb-1">Account Number:</td>
+                        <td>123455667788990</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold pe-3 pb-1">IFSC code:</td>
+                        <td>SBIN0000811</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold pe-3 pb-0">Bank & Branch:</td>
+                        <td>State Bank of India, MAIN BRANCH</td>
+                    </tr>
+                </table>
+
+                <div class="d-flex align-items-center mb-4">
+                    @if(!string.IsNullOrEmpty(Model.QRCodeBase64))
+                    {
+                        <img src="@Model.QRCodeBase64" alt="QR Code" style="width: 100px; height: 100px; margin-right:20px;" />
+                    }
+                    <div>
+                        <div class="fw-bold text-dark">Scan & Pay</div>
+                        <div class="text-muted" style="font-size:0.9rem; margin-bottom:5px;">payments@company.com</div>
+                        <div style="font-size:0.85rem; color:#666;">Scan with your<br/>payment app to make<br/>payment instantly</div>
+                    </div>
+                </div>
+
+                <div class="section-title mt-4">Terms & Notes</div>
+                <div class="billing-text mb-4">
+                    @(string.IsNullOrEmpty(Model.Invoice.TermsAndConditions) ? "Return and replace of order is valid only within 7 days." : Model.Invoice.TermsAndConditions)
+                </div>
+
+                <div class="section-title mt-4">Declaration</div>
+                <div class="billing-text">
+                    Happy Shopping!!<br />
+                    Demo and Installation will be done within a day.
+                </div>
+            </div>
+
+            <div class="col-md-6 text-end d-flex flex-column justify-content-between">
+                <div>
+                    <table class="ms-auto" style="font-size:1.1rem; color:#222;">
+                        <tr>
+                            <td class="fw-bold pe-4 pb-2 text-end">Shipping Details :</td>
+                            <td class="text-end">₹ @Model.Invoice.ShippingCost.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold pe-4 pt-2 text-end" style="font-size:1.3rem;">Total Amount :</td>
+                            <td class="text-end fw-bold" style="font-size:1.3rem;">₹ @Model.Invoice.GrandTotalAmount.ToString("0.00")</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="mt-auto pt-5">
+                    <!-- Handwritten Signature Font Placeholder -->
+                    <div style="font-family: 'Brush Script MT', cursive; font-size: 3rem; color: #000; margin-bottom: -10px; opacity:0.8;">
+                        Auth. Sign
+                    </div>
+                    <div style="border-top: 1px solid #000; width: 200px; margin-left: auto; display:block;"></div>
+                    <div class="fw-bold mt-2 text-dark">Authorised Signature</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Wave Footer -->
+    <div class="inv-footer-curve d-flex justify-content-between align-items-end mt-5">
+        <div style="font-size:0.85rem; max-width: 320px;">
+            <strong style="font-size: 1rem;">PARAS PANCHAL</strong><br/>
+            AI Tooling Specialist | Dubai, UAE<br/>
+        </div>
+        <div style="font-size:0.85rem;" class="text-center">
+            <strong>Mobile:</strong> +971 50 287 7414<br/>
+            <strong>Email:</strong> paraspanchal5555@gmail.com<br/>
+            <strong>Portfolio:</strong> <a href="https://paras-panchal.netlify.app/" style="color: white; text-decoration: none;">paras-panchal.netlify.app</a>
+        </div>
+         <div style="font-size:0.85rem;" class="text-end">
+            <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/paras-panchal-718679223/" style="color: white; text-decoration: none;">LinkedIn Profile</a><br/>
+            <strong>GitHub:</strong> <a href="https://github.com/paras245" style="color: white; text-decoration: none;">github.com/paras245</a><br/>
+            <div class="mt-2 text-white px-2 py-1 rounded" style="background: rgba(255,255,255,0.2); display:inline-block; font-size:0.75rem;">
+                Powered by <i class="fa-solid fa-cube mx-1"></i> Paras Panchal
+            </div>
+        </div>
+    </div>
+
+</div>

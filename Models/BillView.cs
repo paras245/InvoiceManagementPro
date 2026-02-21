@@ -1,25 +1,35 @@
-﻿namespace InvoiceManagementPro.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace InvoiceManagementPro.Models
 {
-    public class BillView
+    // DTO for accepting AJAX Invoice submissions from the JS UI
+    public class InvoiceSubmissionDto
     {
-        public int? BillId { get; set; }
-        public int? BillAmount { get; set; }
-        public int? CustomerId { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerNumber { get; set; }
-        public int? TotalAmount { get; set; }
-        public DateTime? BillCreatedDate { get; set; }
-        public int? ProductQuantity { get; set; }
-        public string ProductName { get; set; }
-        public int? Quantity { get; set; }
-        public string QRCodeImage { get; set; } // Add this property for QR code image URL
+        public int CustomerId { get; set; }
+        public DateTime BillCreatedDate { get; set; }
+        public string? POBillNo { get; set; }
+        public string? EwayBillNo { get; set; }
+        public string? VehicleNo { get; set; }
+        public decimal ShippingCost { get; set; }
+        public string? TermsAndConditions { get; set; }
+        
+        public List<InvoiceItemDto> Items { get; set; } = new List<InvoiceItemDto>();
+    }
 
-        //For Bill
-        public int ProductRate { get; set; }
+    public class InvoiceItemDto
+    {
+        public int ProductId { get; set; }
+        public int Quantity { get; set; }
+        public decimal DiscountPercentage { get; set; }
+        public decimal TaxPercentage { get; set; }
+    }
 
-
-
-        //For AccountNumber
-        public int AccountNumber { get; set; }
+    // View Model for rendering printable bills (if needed over raw Entity)
+    public class BillPrintViewModel
+    {
+        public Bill Invoice { get; set; }
+        public Customer Customer { get; set; }
+        public string QRCodeBase64 { get; set; }
     }
 }

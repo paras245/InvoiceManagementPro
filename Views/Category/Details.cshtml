@@ -1,0 +1,73 @@
+@model InvoiceManagementPro.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="dash-card">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-light me-3"><i class="fa-solid fa-arrow-left"></i></a>
+                    <h3 class="dash-card-title m-0">@Model.CategoryName</h3>
+                </div>
+                <div>
+                     @if (Model.Status == "Active")
+                     {
+                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Active</span>
+                     }
+                     else 
+                     {
+                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Inactive</span>
+                     }
+                </div>
+            </div>
+            
+            <div class="card-body pt-4">
+                <div class="row g-4">
+                    <div class="col-md-4 text-center">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3 border" style="height: 200px; width: 100%; overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(Model.ImagePath))
+                            {
+                                <img src="@Model.ImagePath" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="fa-solid fa-image mb-2" style="font-size: 3rem;"></i>
+                                    <p class="mb-0">No Image</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 ps-md-4 align-self-center">
+                        <h5 class="fw-bold text-dark mb-4">Category Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted fw-semibold">Name</div>
+                            <div class="col-sm-8 fw-bold">@Model.CategoryName</div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-sm-4 text-muted fw-semibold">Description</div>
+                            <div class="col-sm-8 text-dark" style="white-space: pre-wrap;">@(string.IsNullOrEmpty(Model.Description) ? "N/A" : Model.Description)</div>
+                        </div>
+
+                        <div class="row mb-3 text-muted" style="font-size:0.85rem;">
+                             <div class="col-sm-4">Category ID</div>
+                             <div class="col-sm-8">#CAT-@Model.CategoryId</div>
+                        </div>
+                        
+                        <hr class="my-4" style="border-color: var(--border-color); opacity: 1;">
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <a href="@Url.Action("Edit", new { id = Model.CategoryId })" class="btn btn-primary fw-semibold flex-grow-1"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Category</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

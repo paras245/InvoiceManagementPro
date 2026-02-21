@@ -5,81 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - InvoiceManagementPro</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/InvoiceManagementPro.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
+    <div id="app-wrapper">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="@Url.Action("Index", "Home")" class="sidebar-brand">
+                    <div style="width:30px; height:30px; background:linear-gradient(135deg, #FF6B6B, #4ECD9D, #4318FF); border-radius:8px;"></div>
+                    InvoicePro
+                </a>
+            </div>
 
-    <a href="@Url.Action("Index", "Home")" style="text-decoration: none;">
-        <h1 class="text-center">Invoice Management System</h1>
-    </a>
-
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">InvoiceManagementPro</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Customer" asp-action="Index">Customers</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Bill" asp-action="Index">Bills</a>
-                        </li>
-                    </ul>
-                     <div class="d-flex align-items-center">
-                        <button onclick="setTheme('dark')" class="btn btn-link text-dark p-0 me-2" title="Turn Dark Mode">
-                            <i class="fa fa-moon-o" style="font-size:24px"></i>
-                        </button>
-                        <button onclick="setTheme('light')" class="btn btn-link text-warning p-0" title="Turn Light Mode">
-                            <i class="fa fa-sun-o" style="font-size:24px"></i>
-                        </button>
-                    </div>
+            <div class="sidebar-search">
+                <div class="sidebar-search-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search..." />
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        
-        <main role="main" class="pb-3">
+
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="fa-solid fa-chart-pie"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Product" asp-action="Index">
+                        <i class="fa-solid fa-box-open"></i> Products
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Category" asp-action="Index">
+                        <i class="fa-solid fa-tags"></i> Categories
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Customer" asp-action="Index">
+                        <i class="fa-solid fa-users"></i> Customers
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="User" asp-action="Index">
+                        <i class="fa-solid fa-user-tie"></i> Employees
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" asp-area="" asp-controller="Bill" asp-action="Index">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Bills & Invoices
+                    </a>
+                </li>
+                
+                <!-- Placeholders based on reference -->
+                <li class="sidebar-item mt-4">
+                    <span class="ps-3 text-uppercase text-muted" style="font-size: 0.75rem; font-weight:700;">Others</span>
+                </li>
+                <li class="sidebar-item mt-2">
+                    <a href="#" class="sidebar-link"><i class="fa-solid fa-headset"></i> Support</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link"><i class="fa-solid fa-envelope-open-text"></i> Email Marketing</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="#" class="sidebar-link"><i class="fa-solid fa-gear"></i> Settings</a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="theme-switch-wrapper">
+                     <span style="font-size: 0.85rem; font-weight: 500;">Light</span>
+                     <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" id="themeToggleSwitch" onchange="toggleTheme(this)">
+                     </div>
+                     <span style="font-size: 0.85rem; font-weight: 500;">Dark</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <h1 class="page-title">@ViewData["Title"]</h1>
+                
+                <div class="top-nav-actions">
+                    <button class="btn btn-light position-relative" style="border-radius: 50%; width: 40px; height: 40px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </button>
+                    <!-- User Avatar Placeholder -->
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background-color:#CBD5E1; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <i class="fa-solid fa-user text-secondary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Body -->
+            <div class="content-body">
+                @RenderBody()
+            </div>
             
-            @RenderBody()
+            <footer class="mt-auto py-3 text-center text-muted" style="font-size: 0.85rem;">
+                &copy; 2023 - InvoiceManagementPro - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </footer>
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2023 - InvoiceManagementPro - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script nonce src="~/lib/jquery/dist/jquery.min.js" crossorigin></script>
     <script nonce src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" crossorigin></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Active Link Highlighting
+        $(document).ready(function() {
+            var currentUrl = window.location.pathname;
+            $('.sidebar-nav .sidebar-link').each(function() {
+                var $this = $(this);
+                // If current url is / (home) or matches href
+                if (currentUrl === '/' && $this.attr('href') === '/') {
+                    $this.addClass('active');
+                } else if ($this.attr('href') !== '/' && currentUrl.indexOf($this.attr('href')) !== -1) {
+                    $this.addClass('active');
+                }
+            });
+        });
+
+        // Theme Toggle Logic
         function setTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
             localStorage.setItem('theme', theme);
+            document.getElementById('themeToggleSwitch').checked = (theme === 'dark');
         }
 
-        // Apply saved theme on load
+        function toggleTheme(checkbox) {
+            if (checkbox.checked) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+        }
+
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            
+            // Allow DOM to load before setting switch state
+            window.addEventListener('DOMContentLoaded', () => {
+                 document.getElementById('themeToggleSwitch').checked = (savedTheme === 'dark');
+            });
         })();
 
         // SweetAlert2 Toast Mixin

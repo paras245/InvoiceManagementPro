@@ -9,227 +9,193 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace InvoiceManagementPro.Controllers
 {
-
-    //Access Modifier ControllerName : InheritedClass
     public class BillController : Controller
     {
-        
-        //Access Modifier  Type 
         private readonly ApplicationDbContext _context;
 
-
-        //Access-Modifier Controller Name 
         public BillController(ApplicationDbContext context)
         {
-            //Dependency Injection
             _context = context;
         }
 
         // GET: Bill/Index
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var allBills = _context.Bill.ToList();
-            var obj = allBills.Select(bill =>
+            var invoices = await _context.Bill
+                .Include(b => b.Customer)
+                .OrderByDescending(b => b.BillCreatedDate)
+                .ToListAsync();
+                
+            return View(invoices);
+        }
+
+        // GET: Bill/Details/5 (Generated Bill View - Reference Mapped)
+        public async Task<IActionResult> Details(int id)
+        {
+            var invoice = await _context.Bill
+                .Include(b => b.Customer)
+                .Include(b => b.BillItems)
+                    .ThenInclude(bi => bi.Product)
+                .FirstOrDefaultAsync(m => m.BillId == id);
+
+            if (invoice == null) return NotFound();
+
+            var viewModel = new BillPrintViewModel
             {
-                var newObj = new BillView();
+                Invoice = invoice,
+                Customer = invoice.Customer
+            };
 
-                newObj.CustomerName = _context.Customer.Where(c => c.CustomerId == bill.CustomerId).Select(c => c.CustomerName).FirstOrDefault();
-                newObj.ProductName = _context.Product.Where(p => p.ProductRate == bill.ProductQuantity).Select(p => p.ProductName).FirstOrDefault();
+            // Generate Payment QR via QRCoder
+            using (MemoryStream ms = new MemoryStream())
+            {
+                string qrData = $"upi://pay?pa=zettan@bank&pn=ZetranCorp&am={invoice.GrandTotalAmount}&cu=INR&tn=INV-{invoice.BillId}";
+                QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrCodeGenerator.CreateQrCode(qrData, QRCodeGenerator.ECCLevel.Q);
+                QRCode qrCode = new QRCode(qrCodeData);
+                using (Bitmap qrCodeImage = qrCode.GetGraphic(20))
+                {
+                    qrCodeImage.Save(ms, ImageFormat.Png);
+                    viewModel.QRCodeBase64 = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+                }
+            }
 
-                newObj.BillId = bill.BillId;
-                newObj.BillCreatedDate = bill.BillCreatedDate;
-                newObj.ProductQuantity = bill.ProductQuantity;
-                newObj.BillAmount = bill.BillAmount;
-                newObj.TotalAmount = bill.TotalAmount;
-                newObj.Quantity = bill.Quantity;
-               // newObj.AccountNumber=
-
-                return newObj;
-            }).ToList();
-
-            return View(obj);
+            return View(viewModel);
         }
 
-        // GET: Bill/Details/5
-        public IActionResult Details(int id)
+        // GET: Bill/Create (Dynamic JS Form)
+        public async Task<IActionResult> Create()
         {
-            var bill = _context.Bill.Find(id);
-            var newObj = new BillView();
+            ViewBag.Customers = await _context.Customer
+                .Select(c => new { c.CustomerId, Name = c.CustomerName + " (" + c.CustomerType + ")" })
+                .ToListAsync();
+                
+            ViewBag.Products = await _context.Product
+                .Select(p => new { p.ProductId, p.ProductName, p.ProductRate, p.ProductUnit })
+                .ToListAsync();
 
-            newObj.CustomerName = _context.Customer.Where(c => c.CustomerId == bill.CustomerId).Select(c => c.CustomerName).FirstOrDefault();
-            newObj.ProductName = _context.Product.Where(p => p.ProductRate == bill.ProductQuantity).Select(p => p.ProductName).FirstOrDefault();
-
-            newObj.BillId = bill.BillId;
-            newObj.BillCreatedDate = bill.BillCreatedDate;
-            newObj.ProductQuantity = bill.ProductQuantity;
-            newObj.BillAmount = bill.BillAmount;
-            newObj.TotalAmount = bill.TotalAmount;
-            newObj.Quantity = bill.Quantity;
-
-            return View(newObj);
-        }
-
-        // GET: Bill/Create
-        public IActionResult Create()
-        {
-            PopulateDropdown();
             return View();
         }
 
-        // POST: Bill/Create
+        // POST: Bill/CreateInvoiceAjax (Accepts the complex nested JSON from JS Builder)
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(Bill bill)
+        public async Task<IActionResult> CreateInvoiceAjax([FromBody] InvoiceSubmissionDto model)
         {
-            PopulateDropdown();
-            if (ModelState.IsValid)
+            if (model == null || !model.Items.Any())
             {
-                var newBill = new Bill();
-                newBill.BillAmount = bill.ProductQuantity;
-                newBill.CustomerId = bill.CustomerId;
-                newBill.TotalAmount = bill.ProductQuantity * bill.Quantity;
-                newBill.BillCreatedDate = bill.BillCreatedDate;
-                newBill.ProductQuantity = bill.ProductQuantity;
-
-                _context.Bill.Add(newBill);
-                _context.SaveChanges();
-
-                TempData["Success"] = "Bill created successfully!";
-                return RedirectToAction(nameof(Index));
+                return BadRequest("Invalid invoice data. Items are required.");
             }
 
-            return View(bill);
-        }
-
-        // GET: Bill/Edit/5
-        public IActionResult Edit(int id)
-        {
-            var bill = _context.Bill.Find(id);
-            return View(bill);
-        }
-
-        // POST: Bill/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Bill bill)
-        {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Entry(bill).State = EntityState.Modified;
-                _context.SaveChanges();
-                TempData["Success"] = "Bill updated successfully!";
-                return RedirectToAction(nameof(Index));
+                // 1. Build Header
+                var bill = new Bill
+                {
+                    CustomerId = model.CustomerId,
+                    BillCreatedDate = model.BillCreatedDate,
+                    POBillNo = model.POBillNo,
+                    EwayBillNo = model.EwayBillNo,
+                    VehicleNo = model.VehicleNo,
+                    ShippingCost = model.ShippingCost,
+                    TermsAndConditions = model.TermsAndConditions,
+                    Status = "Unpaid"
+                };
+
+                decimal rollingSubTotal = 0;
+                decimal rollingDiscount = 0;
+                decimal rollingTax = 0;
+
+                // 2. Build Lines & Process Totals Server-Side for security
+                foreach (var item in model.Items)
+                {
+                    var product = await _context.Product.FindAsync(item.ProductId);
+                    if (product == null) continue;
+
+                    decimal rate = Convert.ToDecimal(product.ProductRate);
+                    decimal gross = rate * item.Quantity;
+                    
+                    decimal discountAmt = gross * (item.DiscountPercentage / 100m);
+                    decimal taxableAmt = gross - discountAmt;
+                    decimal taxAmt = taxableAmt * (item.TaxPercentage / 100m);
+                    
+                    decimal lineTotal = taxableAmt + taxAmt;
+
+                    var billItem = new BillItem
+                    {
+                        ProductId = product.ProductId,
+                        Quantity = item.Quantity,
+                        ItemRate = rate,
+                        DiscountPercentage = item.DiscountPercentage,
+                        TaxPercentage = item.TaxPercentage,
+                        LineTotal = lineTotal
+                    };
+
+                    bill.BillItems.Add(billItem);
+
+                    rollingSubTotal += gross;
+                    rollingDiscount += discountAmt;
+                    rollingTax += taxAmt;
+                }
+
+                if (!bill.BillItems.Any())
+                {
+                    return BadRequest("No valid products found for billing.");
+                }
+
+                // 3. Finalize Aggregates
+                bill.SubTotal = rollingSubTotal;
+                bill.TotalDiscount = rollingDiscount;
+                bill.TotalTax = rollingTax;
+                bill.GrandTotalAmount = rollingSubTotal - rollingDiscount + rollingTax + bill.ShippingCost;
+
+                // Backwards compat legacy fields to prevent breaking existing views
+                bill.TotalAmount = (int)bill.GrandTotalAmount;
+                bill.BillAmount = (int)bill.SubTotal;
+
+                _context.Bill.Add(bill);
+                await _context.SaveChangesAsync();
+
+                // 4. Return success and the new ID to redirect to Details
+                return Json(new { success = true, invoiceId = bill.BillId, message = "Invoice generated successfully!" });
             }
-            return View(bill);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal error finalizing invoice: " + ex.Message);
+            }
         }
 
         // GET: Bill/Delete/5
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var bill = _context.Bill.Find(id);
-            var newObj = new BillView();
-            newObj.CustomerName = _context.Customer.Where(c => c.CustomerId == bill.CustomerId).Select(c => c.CustomerName).FirstOrDefault();
-            newObj.ProductName = _context.Product.Where(p => p.ProductRate == bill.ProductQuantity).Select(p => p.ProductName).FirstOrDefault();
-
-            newObj.BillId = bill.BillId;
-            newObj.BillCreatedDate = bill.BillCreatedDate;
-            newObj.ProductQuantity = bill.ProductQuantity;
-            newObj.BillAmount = bill.BillAmount;
-            newObj.TotalAmount = bill.TotalAmount;
-            newObj.Quantity = bill.Quantity;
-
-            return View(newObj);
+            var invoice = await _context.Bill
+                .Include(b => b.Customer)
+                .FirstOrDefaultAsync(m => m.BillId == id);
+                
+            if (invoice == null) return NotFound();
+            return View(invoice);
         }
 
         // POST: Bill/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var bill = _context.Bill.Find(id);
-            _context.Bill.Remove(bill);
-            _context.SaveChanges();
-            TempData["Success"] = "Bill deleted successfully!";
+            var invoice = await _context.Bill
+                .Include(b => b.BillItems) // Cascade delete lines
+                .FirstOrDefaultAsync(m => m.BillId == id);
+                
+            if (invoice != null)
+            {
+                _context.BillItem.RemoveRange(invoice.BillItems);
+                _context.Bill.Remove(invoice);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Invoice deleted permanently!";
+            }
             return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult PrintBill(int id)
-        {
-            var bill = _context.Bill.Find(id);
-            var customer = _context.Customer.FirstOrDefault(c => c.CustomerId == bill.CustomerId);
-            var product = _context.Product.FirstOrDefault(p => p.ProductRate == bill.ProductQuantity);
-
-            var billView = new BillView
-            {
-                BillId = bill.BillId,
-                CustomerName = customer?.CustomerName,
-                TotalAmount = bill.TotalAmount,
-                BillCreatedDate = bill.BillCreatedDate,
-                ProductQuantity = bill.ProductQuantity,
-                ProductName = product?.ProductName,
-                ProductRate = product.ProductRate
-            };
-
-            using (MemoryStream ms = new MemoryStream())
-            {
-                QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrCodeGenerator.CreateQrCode(billView.BillId.ToString(), QRCodeGenerator.ECCLevel.Q);
-                QRCode qrCode = new QRCode(qrCodeData);
-                using (Bitmap qrCodeImage = qrCode.GetGraphic(20))
-                {
-                    qrCodeImage.Save(ms, ImageFormat.Png);
-                    string base64Image = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
-                    billView.QRCodeImage = base64Image;
-                }
-            }
-
-            return View(billView);
-        }
-
-
-        // GET: Bill/GenerateQRCode/5
-        public IActionResult GenerateQRCode(int id)
-        {
-            var bill = _context.Bill.Find(id);
-
-            using (MemoryStream ms = new MemoryStream())
-            {
-                QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrCodeGenerator.CreateQrCode(bill.ToString(), QRCodeGenerator.ECCLevel.Q);
-                QRCode qrCode = new QRCode(qrCodeData);
-                using (Bitmap qrCodeImage = qrCode.GetGraphic(20))
-                {
-                    qrCodeImage.Save(ms, ImageFormat.Png);
-                    string base64Image = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
-                    return PartialView("_QRCodePartial", base64Image);
-                }
-            }
-        }
-
-
-
-        public void PopulateDropdown()
-        {
-            var productQuantity = _context.Product.Select(p =>
-                new SelectListItem
-                {
-                    Value = p.ProductRate.ToString(),
-                    Text = p.ProductName
-                }).ToList();
-
-            ViewData["ProductList"] = productQuantity;
-
-            var customerList = _context.Customer.Select(c =>
-                new SelectListItem
-                {
-                    Value = c.CustomerId.ToString(),
-                    Text = c.CustomerName
-                }).ToList();
-
-            ViewData["CustomerList"] = customerList;
         }
     }
 }

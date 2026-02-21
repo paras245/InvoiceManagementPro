@@ -1,48 +1,66 @@
 ﻿@model InvoiceManagementPro.Models.Customer
 
 @{
-    ViewData["Title"] = "Delete Customer";
+    ViewData["Title"] = "Remove Customer";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow mb-4 border-danger">
-            <div class="card-header py-3 bg-danger text-white">
-                <h6 class="m-0 font-weight-bold"><i class="fa fa-exclamation-triangle"></i> Delete Customer</h6>
-            </div>
-            <div class="card-body">
-                <h4 class="text-center text-danger mb-4">Are you sure you want to delete this customer?</h4>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <tbody>
-                            <tr>
-                                <th class="bg-light" style="width: 40%">@Html.DisplayNameFor(model => model.CustomerName)</th>
-                                <td>@Html.DisplayFor(model => model.CustomerName)</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">@Html.DisplayNameFor(model => model.PhoneNumber)</th>
-                                <td>@Html.DisplayFor(model => model.PhoneNumber)</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerCity)</th>
-                                <td>@Html.DisplayFor(model => model.CustomerCity)</td>
-                            </tr>
-                            <tr>
-                                <th class="bg-light">@Html.DisplayNameFor(model => model.CustomerDetail)</th>
-                                <td>@Html.DisplayFor(model => model.CustomerDetail)</td>
-                            </tr>
-                        </tbody>
-                    </table>
+    <div class="col-md-8">
+        <div class="dash-card border border-danger border-opacity-25">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center">
+                    <h3 class="dash-card-title m-0 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> Remove Customer Account</h3>
                 </div>
+            </div>
+            
+            <div class="card-body pt-4">
+                <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-0 mb-4" role="alert">
+                    <i class="fa-solid fa-trash-can me-2"></i> <strong>Hard Deletion Warning!</strong> Proceeding will permanently purge this customer record and instantly destroy any associated company logo files from the server's storage (`/wwwroot/uploads/customers/`). This is irreversible.
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3 text-center align-self-center">
+                        <div class="mb-2 d-flex justify-content-center">
+                            @if(!string.IsNullOrEmpty(Model.LogoImagePath))
+                            {
+                                <div style="width: 100px; height: 100px; border-radius: 8px; border: 2px solid #f8f9fc; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: white; filter: grayscale(100%);">
+                                     <img src="@Model.LogoImagePath" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                                </div>
+                            }
+                            else 
+                            {
+                                 <i class="fa-solid fa-building text-muted" style="font-size: 5rem;"></i>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-9 align-self-center">
+                        <h4 class="fw-bold text-dark mb-1">@Model.CustomerName</h4>
+                        <p class="text-muted mb-3">@Model.CustomerType | @(string.IsNullOrEmpty(Model.GSTIN) ? "No Tax ID" : Model.GSTIN)</p>
+                        
+                        <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Contact</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">@(string.IsNullOrEmpty(Model.ContactPerson) ? "N/A" : Model.ContactPerson)</div>
+                        </div>
+
+                        <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Email</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">@(string.IsNullOrEmpty(Model.Email) ? "N/A" : Model.Email)</div>
+                        </div>
+                        
+                        <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Phone</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">@Model.PhoneNumber</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: var(--border-color); opacity: 1;">
                 
-                <form asp-action="Delete" class="text-center mt-3">
+                <form asp-action="Delete" class="d-flex gap-2">
                     <input type="hidden" asp-for="CustomerId" />
-                    <button type="submit" class="btn btn-danger btn-lg me-2">
-                        <i class="fa fa-trash"></i> Confirm Delete
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="fa fa-times"></i> Cancel
-                    </a>
+                    <a href="@Url.Action("Index")" class="btn btn-light border fw-semibold flex-grow-1">Cancel</a>
+                    <button type="submit" class="btn btn-danger fw-semibold flex-grow-1"><i class="fa-solid fa-fire me-2"></i> Confirm Purge</button>
                 </form>
             </div>
         </div>

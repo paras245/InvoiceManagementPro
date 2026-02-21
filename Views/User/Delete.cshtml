@@ -1,0 +1,66 @@
+@model InvoiceManagementPro.Models.User
+
+@{
+    ViewData["Title"] = "Terminate Employee";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="dash-card border border-danger border-opacity-25">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center">
+                    <h3 class="dash-card-title m-0 text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> Terminate Employee Record</h3>
+                </div>
+            </div>
+            
+            <div class="card-body pt-4">
+                <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-0 mb-4" role="alert">
+                    <i class="fa-solid fa-user-slash me-2"></i> <strong>Critical Warning!</strong> Action is irreversible. Employee profile image and all personal identification data recorded here will be permanently removed from the system file storage and database.
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3 text-center align-self-center">
+                        <div class="mb-2">
+                            @if(!string.IsNullOrEmpty(Model.ProfileImagePath))
+                            {
+                                <img src="@Model.ProfileImagePath" alt="Profile" style="height:100px; width:100px; object-fit:cover; border-radius:50%; border:3px solid #f1f5f9; box-shadow: 0 0 10px rgba(0,0,0,0.1); opacity:0.8; filter: grayscale(100%);"/>
+                            }
+                            else 
+                            {
+                                 <i class="fa-solid fa-circle-user text-muted" style="font-size: 5rem;"></i>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-9 align-self-center">
+                        <h4 class="fw-bold text-dark mb-1">@Model.FullName</h4>
+                        <p class="text-muted mb-3">@Model.Role | @Model.EmploymentType</p>
+                        
+                        <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Email</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">@Model.Email</div>
+                        </div>
+                        
+                        <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Phone</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">@Model.PhoneNumber</div>
+                        </div>
+
+                         <div class="row mb-1">
+                            <div class="col-sm-4 text-muted fw-semibold" style="font-size:0.9rem;">Employee ID</div>
+                            <div class="col-sm-8 fw-bold" style="font-size:0.9rem;">#EMP-@Model.UserId.ToString("D4")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: var(--border-color); opacity: 1;">
+                
+                <form asp-action="Delete" class="d-flex gap-2">
+                    <input type="hidden" asp-for="UserId" />
+                    <a href="@Url.Action("Index")" class="btn btn-light border fw-semibold flex-grow-1">Cancel Action</a>
+                    <button type="submit" class="btn btn-danger fw-semibold flex-grow-1"><i class="fa-solid fa-user-times me-2"></i> Confirm Termination</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
