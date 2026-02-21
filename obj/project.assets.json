@@ -10967,19 +10967,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\.nuget\\packages\\": {}
+    "C:\\Users\\Administrator\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\Codes\\InvoiceManagementPro\\InvoiceManagementPro\\InvoiceManagementPro\\InvoiceManagementPro.csproj",
+      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\Codes2025\\InvoiceManagementPro\\InvoiceManagementPro.csproj",
       "projectName": "InvoiceManagementPro",
-      "projectPath": "C:\\Users\\Administrator\\Desktop\\Codes\\InvoiceManagementPro\\InvoiceManagementPro\\InvoiceManagementPro\\InvoiceManagementPro.csproj",
+      "projectPath": "C:\\Users\\Administrator\\Desktop\\Codes2025\\InvoiceManagementPro\\InvoiceManagementPro.csproj",
       "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Administrator\\Desktop\\Codes\\InvoiceManagementPro\\InvoiceManagementPro\\InvoiceManagementPro\\obj\\",
+      "outputPath": "C:\\Users\\Administrator\\Desktop\\Codes2025\\InvoiceManagementPro\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -10987,6 +10992,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -11004,7 +11010,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net6.0": {
@@ -11060,7 +11067,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101\\RuntimeIdentifierGraph.json"
       }
     }
   }
