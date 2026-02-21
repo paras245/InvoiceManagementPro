@@ -1,65 +1,320 @@
-﻿@model InvoiceManagementPro.Models.Bill
-
-@{
-    ViewData["Title"] = "Create Bill";
+﻿@{
+    ViewData["Title"] = "Create New Invoice";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-9">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3" style="background: linear-gradient(45deg, #36b9cc, #2c9faf); color: white;">
-                <h6 class="m-0 font-weight-bold">Create New Bill</h6>
+    <div class="col-xl-11">
+        <div class="dash-card">
+            <div class="dash-card-header pb-3 mb-4" style="border-bottom: 1px solid var(--border-color);">
+                <h3 class="dash-card-title m-0"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Invoice Generator</h3>
+                <p class="text-muted m-0 mt-1" style="font-size:0.85rem;">Build an itemized invoice. Totals calculate automatically.</p>
             </div>
+
             <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="CustomerId" class="form-label fw-bold">Customer</label>
-                            <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(ViewBag.CustomerList, "Value", "Text"))">
-                                <option value="">-- Select Customer --</option>
-                            </select>
-                            <span asp-validation-for="CustomerId" class="text-danger"></span>
-                        </div>
+                <!-- Header Fields -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Billed To (Customer) <span class="text-danger">*</span></label>
+                        <select id="customerId" class="form-select">
+                            <option value="">-- Select Customer --</option>
+                            @if (ViewBag.Customers != null)
+                            {
+                                foreach (var cust in ViewBag.Customers)
+                                {
+                                    <option value="@cust.CustomerId">@cust.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Invoice Date <span class="text-danger">*</span></label>
+                        <input type="date" id="billDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">PO Number (Optional)</label>
+                        <input type="text" id="poBillNo" class="form-control" placeholder="PO-9751" />
+                    </div>
+                </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ProductQuantity" class="form-label fw-bold">Product</label>
-                            <select asp-for="ProductQuantity" class="form-select" asp-items="@(new SelectList(ViewBag.ProductList, "Value", "Text"))">
-                                <option value="">-- Select Product --</option>
-                            </select>
-                            <span asp-validation-for="ProductQuantity" class="text-danger"></span>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">E-Way Bill No.</label>
+                        <input type="text" id="ewayBillNo" class="form-control" placeholder="0845 6845 2013" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Vehicle Transport No.</label>
+                        <input type="text" id="vehicleNo" class="form-control" placeholder="TN-38-AY-5143" />
+                    </div>
+                     <div class="col-md-4">
+                        <label class="form-label fw-semibold">Shipping / Freight Charge (₹)</label>
+                        <input type="number" id="shippingCost" class="form-control" value="0.00" min="0" step="0.01" onchange="calculateGrandTotal()" />
+                    </div>
+                </div>
+
+                <!-- Line Items Table -->
+                <h5 class="fw-bold mb-3">Itemized Details</h5>
+                <div class="table-responsive border rounded mb-3">
+                    <table class="table table-hover align-middle m-0" id="invoiceTable">
+                        <thead class="bg-light text-muted" style="font-size:0.85rem; text-transform:uppercase;">
+                            <tr>
+                                <th style="width: 35%;">Product / Item</th>
+                                <th style="width: 10%;">Rate (₹)</th>
+                                <th style="width: 10%;">Qty</th>
+                                <th style="width: 12%;">Discount (%)</th>
+                                <th style="width: 12%;">Tax / GST (%)</th>
+                                <th style="width: 15%;" class="text-end">Amount (₹)</th>
+                                <th style="width: 6%;" class="text-center"><i class="fa-solid fa-gear"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceItemsBody">
+                            <!-- Dynamic Rows Inserted Here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-light border text-primary fw-semibold btn-sm mb-5" onclick="addInvoiceRow()">
+                    <i class="fa-solid fa-plus me-1"></i> Add Item Line
+                </button>
+
+                <!-- Calculation Footer -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Terms & Conditions</label>
+                        <textarea id="terms" class="form-control" rows="4" placeholder="Return and replace of order is valid only within 7 days."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light p-4 rounded border">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-semibold text-muted">Sub Total:</span>
+                                <span class="fw-bold fs-5 text-dark" id="lblSubTotal">₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-semibold text-muted">Total Discount:</span>
+                                <span class="fw-bold text-success" id="lblTotalDiscount">- ₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-semibold text-muted">Total Tax:</span>
+                                <span class="fw-bold text-danger" id="lblTotalTax">+ ₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3 pb-3" style="border-bottom: 1px dashed var(--border-color);">
+                                <span class="fw-semibold text-muted">Shipping & Handling:</span>
+                                <span class="fw-bold text-dark" id="lblShipping">+ ₹ 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold fs-5 text-dark">Grand Total:</span>
+                                <span class="fw-bold fs-3 text-primary" id="lblGrandTotal">₹ 0.00</span>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Quantity" class="form-label fw-bold">Quantity</label>
-                            <input asp-for="Quantity" class="form-control" placeholder="Enter quantity" type="number" />
-                            <span asp-validation-for="Quantity" class="text-danger"></span>
-                        </div>
+                <hr class="my-5" style="border-color: var(--border-color); opacity: 1;">
 
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="BillCreatedDate" class="form-label fw-bold">Bill Date</label>
-                            <input asp-for="BillCreatedDate" class="form-control" type="datetime-local" />
-                            <span asp-validation-for="BillCreatedDate" class="text-danger"></span>
-                        </div>
-                    </div>
+                <div class="d-flex justify-content-end gap-3">
+                    <a asp-action="Index" class="btn btn-light border fw-semibold px-4">Cancel</a>
+                    <button class="btn btn-primary fw-semibold px-5" onclick="submitInvoice()">
+                        <i class="fa-solid fa-file-invoice me-2"></i> Execute & Generate Invoice
+                    </button>
+                </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-3">
-                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save Bill</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Hidden Template for Rows -->
+<select id="productTemplate" style="display:none;">
+    <option value="" data-rate="0">-- Select --</option>
+    @if (ViewBag.Products != null)
+    {
+        foreach (var prod in ViewBag.Products)
+        {
+            <option value="@prod.ProductId" data-rate="@prod.ProductRate">@prod.ProductName (@prod.ProductUnit)</option>
+        }
+    }
+</select>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script type="text/javascript">
-        // Basic calculations if needed, though most logic should be handled backend or with Vue/React if complex
-        // Keeping it simple for now as per requirements
+    <script>
+        // Store product raw data for quick lookup in UI
+        const productsList = document.getElementById("productTemplate").innerHTML;
+        let rowCount = 0;
+
+        // Initialize with one row
+        document.addEventListener("DOMContentLoaded", function() {
+            addInvoiceRow();
+        });
+
+        function addInvoiceRow() {
+            rowCount++;
+            const tbody = document.getElementById('invoiceItemsBody');
+            const tr = document.createElement('tr');
+            tr.id = `row-${rowCount}`;
+
+            tr.innerHTML = `
+                <td>
+                    <select class="form-select form-select-sm productId-select" onchange="productSelected(this, ${rowCount})">
+                        ${productsList}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm border-0 bg-transparent row-rate" value="0.00" readonly />
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm item-qty" value="1" min="1" onchange="calculateRow(${rowCount})" onkeyup="calculateRow(${rowCount})" />
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm item-disc" value="0" min="0" max="100" onchange="calculateRow(${rowCount})" onkeyup="calculateRow(${rowCount})" />
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm item-tax" value="18" min="0" max="100" onchange="calculateRow(${rowCount})" onkeyup="calculateRow(${rowCount})" />
+                </td>
+                <td class="text-end fw-bold text-dark row-total">
+                    ₹ 0.00
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm text-danger" onclick="removeRow(${rowCount})"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function removeRow(id) {
+            const row = document.getElementById(`row-${id}`);
+            if (row) {
+                row.remove();
+                calculateGrandTotal();
+            }
+        }
+
+        function productSelected(selectElement, rowId) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
+            
+            const row = document.getElementById(`row-${rowId}`);
+            row.querySelector('.row-rate').value = rate.toFixed(2);
+            
+            calculateRow(rowId);
+        }
+
+        function calculateRow(rowId) {
+            const row = document.getElementById(`row-${rowId}`);
+            
+            const rate = parseFloat(row.querySelector('.row-rate').value) || 0;
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const discPercent = parseFloat(row.querySelector('.item-disc').value) || 0;
+            const taxPercent = parseFloat(row.querySelector('.item-tax').value) || 0;
+
+            const gross = rate * qty;
+            const discAmt = gross * (discPercent / 100);
+            const taxable = gross - discAmt;
+            const taxAmt = taxable * (taxPercent / 100);
+            const lineTotal = taxable + taxAmt;
+
+            // Store pure numbers in data attributes for final submission scan
+            row.setAttribute('data-gross', gross.toFixed(2));
+            row.setAttribute('data-discamt', discAmt.toFixed(2));
+            row.setAttribute('data-taxamt', taxAmt.toFixed(2));
+            row.setAttribute('data-linetotal', lineTotal.toFixed(2));
+
+            row.querySelector('.row-total').innerText = '₹ ' + lineTotal.toFixed(2);
+            
+            calculateGrandTotal();
+        }
+
+        function calculateGrandTotal() {
+            let subTotal = 0;
+            let totalDisc = 0;
+            let totalTax = 0;
+
+            const rows = document.querySelectorAll('#invoiceItemsBody tr');
+            rows.forEach(row => {
+                subTotal += parseFloat(row.getAttribute('data-gross')) || 0;
+                totalDisc += parseFloat(row.getAttribute('data-discamt')) || 0;
+                totalTax += parseFloat(row.getAttribute('data-taxamt')) || 0;
+            });
+
+            const shipping = parseFloat(document.getElementById('shippingCost').value) || 0;
+
+            const grandTotal = (subTotal - totalDisc) + totalTax + shipping;
+
+            // Update UI Labels
+            document.getElementById('lblSubTotal').innerText = '₹ ' + subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('lblTotalDiscount').innerText = '- ₹ ' + totalDisc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('lblTotalTax').innerText = '+ ₹ ' + totalTax.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('lblShipping').innerText = '+ ₹ ' + shipping.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('lblGrandTotal').innerText = '₹ ' + grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function submitInvoice() {
+            const customerId = document.getElementById('customerId').value;
+             if (!customerId) {
+                Swal.fire('Error', 'Please select a Billed To Customer.', 'error');
+                return;
+            }
+
+            const itemsArr = [];
+            const rows = document.querySelectorAll('#invoiceItemsBody tr');
+            
+            rows.forEach(row => {
+                const prodId = row.querySelector('.productId-select').value;
+                if(prodId) {
+                    itemsArr.push({
+                        ProductId: parseInt(prodId),
+                        Quantity: parseInt(row.querySelector('.item-qty').value) || 1,
+                        DiscountPercentage: parseFloat(row.querySelector('.item-disc').value) || 0,
+                        TaxPercentage: parseFloat(row.querySelector('.item-tax').value) || 0
+                    });
+                }
+            });
+
+            if (itemsArr.length === 0) {
+                 Swal.fire('Error', 'Please add at least one valid product line to the invoice.', 'error');
+                 return;
+            }
+
+            // Build payload matching InvoiceSubmissionDto
+            const payload = {
+                CustomerId: parseInt(customerId),
+                BillCreatedDate: document.getElementById('billDate').value,
+                POBillNo: document.getElementById('poBillNo').value,
+                EwayBillNo: document.getElementById('ewayBillNo').value,
+                VehicleNo: document.getElementById('vehicleNo').value,
+                ShippingCost: parseFloat(document.getElementById('shippingCost').value) || 0,
+                TermsAndConditions: document.getElementById('terms').value,
+                Items: itemsArr
+            };
+
+            // Lock UI
+            Swal.fire({
+                title: 'Generating Invoice...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            fetch('@Url.Action("CreateInvoiceAjax", "Bill")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if(!response.ok) throw new Error("Network response failed.");
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the newly generated Printed Details view
+                    window.location.href = '@Url.Action("Details", "Bill")/' + data.invoiceId;
+                } else {
+                    Swal.fire('Error', data.message || 'Failed to generate invoice.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'A server error occurred while processing the request.', 'error');
+            });
+        }
     </script>
 }

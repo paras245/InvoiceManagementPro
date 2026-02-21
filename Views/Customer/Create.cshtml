@@ -1,52 +1,164 @@
 ﻿@model InvoiceManagementPro.Models.Customer
 
 @{
-    ViewData["Title"] = "Create Customer";
+    ViewData["Title"] = "Add Customer";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3" style="background: linear-gradient(45deg, #1cc88a, #13855c); color: white;">
-                <h6 class="m-0 font-weight-bold">Add Customer</h6>
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    
+    <div class="row g-4 justify-content-center">
+        <!-- Left Panel: Profile & Classification -->
+        <div class="col-lg-4">
+            <div class="dash-card mb-4">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-camera me-2 text-primary"></i> Company Logo</h5>
+                </div>
+                <div class="card-body pt-4 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-building text-muted" style="font-size: 6rem;"></i>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label asp-for="LogoImageUpload" class="form-label fw-semibold" style="font-size:0.9rem;">Upload Logo</label>
+                        <input asp-for="LogoImageUpload" type="file" class="form-control form-control-sm" accept="image/*" />
+                        <small class="text-muted">Max 2MB. Square image recommended.</small>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="dash-card">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-id-badge me-2 text-primary"></i> Classification</h5>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="mb-3">
+                        <label asp-for="CustomerType" class="form-label fw-semibold">Customer Type <span class="text-danger">*</span></label>
+                        <select asp-for="CustomerType" class="form-select">
+                            <option value="Business">B2B - Business</option>
+                            <option value="Individual">B2C - Individual</option>
+                        </select>
+                        <span asp-validation-for="CustomerType" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="GSTIN" class="form-label fw-semibold">GSTIN / Tax ID</label>
+                        <input asp-for="GSTIN" class="form-control" placeholder="e.g. 22AAAAA0000A1Z5" />
+                        <span asp-validation-for="GSTIN" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
                     
                     <div class="mb-3">
-                        <label asp-for="CustomerName" class="form-label fw-bold">Customer Name</label>
-                        <input asp-for="CustomerName" class="form-control" placeholder="Enter name" />
-                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                        <label asp-for="AccountNumber" class="form-label fw-semibold">Account Number (Optional)</label>
+                        <input asp-for="AccountNumber" class="form-control" type="number" />
+                        <span asp-validation-for="AccountNumber" class="text-danger" style="font-size:0.85rem;"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="PhoneNumber" class="form-label fw-bold">Phone Number</label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+                        <div class="d-flex flex-wrap gap-2 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Status" value="Active" id="statusActive" checked>
+                                <label class="form-check-label badge bg-success bg-opacity-10 text-success p-2 rounded-pill" for="statusActive">Active</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Status" value="Inactive" id="statusInactive">
+                                <label class="form-check-label badge bg-danger bg-opacity-10 text-danger p-2 rounded-pill" for="statusInactive">Inactive</label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Primary & Address -->
+        <div class="col-lg-8">
+            <div class="dash-card mb-4">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h4 class="dash-card-title m-0"><i class="fa-solid fa-address-book me-2 text-primary"></i> Primary Contact</h4>
+                </div>
+                
+                <div class="card-body pt-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="CustomerName" class="form-label fw-semibold">Company / Client Name <span class="text-danger">*</span></label>
+                            <input asp-for="CustomerName" class="form-control" placeholder="Acme Corp" />
+                            <span asp-validation-for="CustomerName" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label asp-for="ContactPerson" class="form-label fw-semibold">Contact Person</label>
+                            <input asp-for="ContactPerson" class="form-control" placeholder="John Doe" />
+                            <span asp-validation-for="ContactPerson" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CustomerCity" class="form-label fw-bold">City</label>
-                        <input asp-for="CustomerCity" class="form-control" placeholder="Enter city" />
-                        <span asp-validation-for="CustomerCity" class="text-danger"></span>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-semibold">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="billing@acme.com" />
+                            <span asp-validation-for="Email" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label asp-for="PhoneNumber" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="+1 (555) 000-0000" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                 <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h4 class="dash-card-title m-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i> Address Information</h4>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="BillingAddress" class="form-label fw-semibold">Billing Address</label>
+                            <textarea asp-for="BillingAddress" class="form-control" rows="2" placeholder="123 Corporate Blvd..."></textarea>
+                            <span asp-validation-for="BillingAddress" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label asp-for="ShippingAddress" class="form-label fw-semibold">Shipping Address (If different)</label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="2" placeholder="Warehouse Wing A..."></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CustomerDetail" class="form-label fw-bold">Details (Address)</label>
-                        <textarea asp-for="CustomerDetail" class="form-control" rows="3" placeholder="Enter address details"></textarea>
-                        <span asp-validation-for="CustomerDetail" class="text-danger"></span>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="CustomerCity" class="form-label fw-semibold">City <span class="text-danger">*</span></label>
+                            <input asp-for="CustomerCity" class="form-control" />
+                            <span asp-validation-for="CustomerCity" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                         <div class="col-md-4 mt-3 mt-md-0">
+                            <label asp-for="State" class="form-label fw-semibold">State / Region</label>
+                            <input asp-for="State" class="form-control" />
+                            <span asp-validation-for="State" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-4 mt-3 mt-md-0">
+                            <label asp-for="ZipCode" class="form-label fw-semibold">Zip / Postal Code</label>
+                            <input asp-for="ZipCode" class="form-control" />
+                            <span asp-validation-for="ZipCode" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                        <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    <div class="mb-4">
+                        <label asp-for="CustomerDetail" class="form-label fw-semibold">Notes / Details</label>
+                        <textarea asp-for="CustomerDetail" class="form-control" rows="2" placeholder="Additional instructions..."></textarea>
+                        <span asp-validation-for="CustomerDetail" class="text-danger" style="font-size:0.85rem;"></span>
                     </div>
-                </form>
+
+                    <hr class="mt-5 mb-4" style="border-color: var(--border-color); opacity: 1;">
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-light border fw-semibold px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4"><i class="fa-solid fa-plus me-1"></i> Save Customer Record</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

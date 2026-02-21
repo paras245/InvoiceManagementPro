@@ -5,46 +5,128 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3" style="background: linear-gradient(45deg, #4e73df, #224abe); color: white;">
-                <h6 class="m-0 font-weight-bold">Edit Product</h6>
+    <div class="col-md-10 col-lg-8">
+        <div class="dash-card">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <h3 class="dash-card-title m-0"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i> Edit Product</h3>
             </div>
-            <div class="card-body">
-                <form asp-action="Edit">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="card-body pt-4">
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <input type="hidden" asp-for="ProductId" />
+                    <!-- Hidden fields to remember paths so we don't null them on edit failure -->
+                    <input type="hidden" asp-for="ImagePath1" />
+                    <input type="hidden" asp-for="ImagePath2" />
+                    <input type="hidden" asp-for="ImagePath3" />
                     
-                    <div class="mb-3">
-                        <label asp-for="ProductName" class="form-label fw-bold">Product Name</label>
-                        <input asp-for="ProductName" class="form-control" placeholder="Enter product name" />
-                        <span asp-validation-for="ProductName" class="text-danger"></span>
-                    </div>
+                    <div class="row g-3">
+                        <!-- Left Column: Details -->
+                        <div class="col-md-7">
+                            <h6 class="fw-bold mb-3 text-muted" style="font-size:0.85rem; text-transform:uppercase;">Basic Details</h6>
+                            
+                            <div class="mb-3">
+                                <label asp-for="ProductName" class="form-label fw-semibold">Product Name <span class="text-danger">*</span></label>
+                                <input asp-for="ProductName" class="form-control" placeholder="Enter product name" />
+                                <span asp-validation-for="ProductName" class="text-danger" style="font-size:0.85rem;"></span>
+                            </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ProductUnit" class="form-label fw-bold">Product Unit</label>
-                        <input asp-for="ProductUnit" class="form-control" placeholder="e.g., Pcs, Kg, Box" />
-                        <span asp-validation-for="ProductUnit" class="text-danger"></span>
-                    </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Category" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                    <select asp-for="Category" class="form-select" asp-items="@(new SelectList(ViewBag.Categories))">
+                                        <option value="">Select Category...</option>
+                                    </select>
+                                    <span asp-validation-for="Category" class="text-danger" style="font-size:0.85rem;"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ProductUnit" class="form-label fw-semibold">Unit <span class="text-danger">*</span></label>
+                                    <input asp-for="ProductUnit" class="form-control" placeholder="e.g., Pcs, Kg" />
+                                    <span asp-validation-for="ProductUnit" class="text-danger" style="font-size:0.85rem;"></span>
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ProductRate" class="form-label fw-bold">Product Rate</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light fw-bold">AED</span>
-                            <input asp-for="ProductRate" class="form-control" placeholder="0.00" />
+                            <div class="mb-3">
+                                <label asp-for="ProductRate" class="form-label fw-semibold">Rate / Price <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted border-end-0">AED</span>
+                                    <input asp-for="ProductRate" class="form-control border-start-0 ps-0" placeholder="0.00" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="ProductRate" class="text-danger" style="font-size:0.85rem;"></span>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+                                <div class="d-flex gap-4 mt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" asp-for="Status" value="Active" id="statusActive">
+                                        <label class="form-check-label" for="statusActive">
+                                            <span class="badge bg-success bg-opacity-10 text-success p-2 px-3 rounded-pill">Active</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" asp-for="Status" value="Inactive" id="statusInactive">
+                                        <label class="form-check-label" for="statusInactive">
+                                            <span class="badge bg-danger bg-opacity-10 text-danger p-2 px-3 rounded-pill">Inactive</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Status" class="text-danger" style="font-size:0.85rem;"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="ProductDescription" class="form-label fw-semibold">Notes / Description</label>
+                                <textarea asp-for="ProductDescription" class="form-control" rows="4" placeholder="Enter product details"></textarea>
+                                <span asp-validation-for="ProductDescription" class="text-danger" style="font-size:0.85rem;"></span>
+                            </div>
                         </div>
-                        <span asp-validation-for="ProductRate" class="text-danger"></span>
+
+                        <!-- Right Column: Images -->
+                        <div class="col-md-5">
+                            <h6 class="fw-bold mb-3 text-muted" style="font-size:0.85rem; text-transform:uppercase;">Product Images (Max 3)</h6>
+                            
+                            <div class="mb-4">
+                                <label asp-for="ImageUpload1" class="form-label fw-semibold" style="font-size:0.9rem;">Primary Image <i class="fa-solid fa-star text-warning" style="font-size:0.7rem;"></i></label>
+                                @if(!string.IsNullOrEmpty(Model.ImagePath1))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.ImagePath1" alt="Image 1" style="max-height:80px; border-radius:8px; border:1px solid var(--border-color);"/>
+                                    </div>
+                                }
+                                <input asp-for="ImageUpload1" type="file" class="form-control form-control-sm" accept="image/*" />
+                                <small class="text-muted d-block mt-1">Upload to replace existing.</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label asp-for="ImageUpload2" class="form-label fw-semibold" style="font-size:0.9rem;">Gallery Image 1</label>
+                                @if(!string.IsNullOrEmpty(Model.ImagePath2))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.ImagePath2" alt="Image 2" style="max-height:80px; border-radius:8px; border:1px solid var(--border-color);"/>
+                                    </div>
+                                }
+                                <input asp-for="ImageUpload2" type="file" class="form-control form-control-sm" accept="image/*" />
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="ImageUpload3" class="form-label fw-semibold" style="font-size:0.9rem;">Gallery Image 2</label>
+                                @if(!string.IsNullOrEmpty(Model.ImagePath3))
+                                {
+                                    <div class="mb-2">
+                                        <img src="@Model.ImagePath3" alt="Image 3" style="max-height:80px; border-radius:8px; border:1px solid var(--border-color);"/>
+                                    </div>
+                                }
+                                <input asp-for="ImageUpload3" type="file" class="form-control form-control-sm" accept="image/*" />
+                            </div>
+                            
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ProductDescription" class="form-label fw-bold">Description</label>
-                        <textarea asp-for="ProductDescription" class="form-control" rows="3" placeholder="Enter product description"></textarea>
-                        <span asp-validation-for="ProductDescription" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                        <button type="submit" class="btn btn-warning text-white"><i class="fa fa-save"></i> Save Changes</button>
-                        <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+                    <hr class="my-4" style="border-color: var(--border-color); opacity: 1;">
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-light border fw-semibold">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-semibold"><i class="fa-solid fa-save me-1"></i> Save Changes</button>
                     </div>
                 </form>
             </div>

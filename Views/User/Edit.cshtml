@@ -1,0 +1,165 @@
+@model InvoiceManagementPro.Models.User
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="ProfileImagePath" />
+    
+    <div class="row g-4 justify-content-center">
+        <!-- Left Panel: Profile & Employment -->
+        <div class="col-lg-4">
+            <div class="dash-card mb-4">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-camera me-2 text-primary"></i> Profile Image</h5>
+                </div>
+                <div class="card-body pt-4 text-center">
+                    <div class="mb-3">
+                        @if(!string.IsNullOrEmpty(Model.ProfileImagePath))
+                        {
+                            <img src="@Model.ProfileImagePath" alt="Profile" style="height:120px; width:120px; object-fit:cover; border-radius:50%; border:3px solid #f1f5f9; box-shadow: 0 0 10px rgba(0,0,0,0.1);"/>
+                        }
+                        else 
+                        {
+                             <i class="fa-solid fa-circle-user text-muted" style="font-size: 6rem;"></i>
+                        }
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label asp-for="ProfileImageUpload" class="form-label fw-semibold" style="font-size:0.9rem;">Update Photo</label>
+                        <input asp-for="ProfileImageUpload" type="file" class="form-control form-control-sm" accept="image/*" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="fw-bold m-0"><i class="fa-solid fa-briefcase me-2 text-primary"></i> Employment Details</h5>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="">Select Role...</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Staff">Staff</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EmploymentType" class="form-label fw-semibold">Emp. Type <span class="text-danger">*</span></label>
+                        <select asp-for="EmploymentType" class="form-select">
+                            <option value="">Select Type...</option>
+                            <option value="Regular">Regular (Full-Time)</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                        <span asp-validation-for="EmploymentType" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="DateOfJoining" class="form-label fw-semibold">Date of Joining <span class="text-danger">*</span></label>
+                        <input asp-for="DateOfJoining" class="form-control" type="date" />
+                        <span asp-validation-for="DateOfJoining" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
+                        <div class="d-flex flex-wrap gap-2 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Status" value="Active" id="statusActive">
+                                <label class="form-check-label badge bg-success bg-opacity-10 text-success p-2 rounded-pill" for="statusActive">Active</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Status" value="Inactive" id="statusInactive">
+                                <label class="form-check-label badge bg-danger bg-opacity-10 text-danger p-2 rounded-pill" for="statusInactive">Inactive</label>
+                            </div>
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="radio" asp-for="Status" value="Suspended" id="statusSuspended">
+                                <label class="form-check-label badge bg-warning bg-opacity-10 text-warning p-2 rounded-pill" for="statusSuspended">Suspended</label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Status" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Personal Info -->
+        <div class="col-lg-8">
+            <div class="dash-card h-100">
+                <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                    <h4 class="dash-card-title m-0"><i class="fa-solid fa-address-card me-2 text-primary"></i> Personal Information</h4>
+                </div>
+                
+                <div class="card-body pt-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label asp-for="LastName" class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            <input asp-for="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label asp-for="PhoneNumber" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger" style="font-size:0.85rem;"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-4 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Gender" value="Male" id="genderMale">
+                                <label class="form-check-label" for="genderMale">Male</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Gender" value="Female" id="genderFemale">
+                                <label class="form-check-label" for="genderFemale">Female</label>
+                            </div>
+                             <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Gender" value="Other" id="genderOther">
+                                <label class="form-check-label" for="genderOther">Other</label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Gender" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Address" class="form-label fw-semibold">Physical Address</label>
+                        <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Address" class="text-danger" style="font-size:0.85rem;"></span>
+                    </div>
+
+                    <hr class="mt-5 mb-4" style="border-color: var(--border-color); opacity: 1;">
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-light border fw-semibold px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-semibold px-4"><i class="fa-solid fa-save me-1"></i> Update Record</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

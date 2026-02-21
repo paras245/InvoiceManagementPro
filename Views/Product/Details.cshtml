@@ -1,25 +1,111 @@
 ﻿@model InvoiceManagementPro.Models.Product
 
-<h1>Product Details</h1>
+@{
+    ViewData["Title"] = "Product Details";
+}
 
-<div>
-    @*<h4>Product ID: @Model.ProductId</h4>*@
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Product Name:</dt>
-        <dd class="col-sm-10">@Model.ProductName</dd>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="dash-card">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-light me-3"><i class="fa-solid fa-arrow-left"></i></a>
+                    <h3 class="dash-card-title m-0">@Model.ProductName</h3>
+                </div>
+                <div>
+                     @if (Model.Status == "Active")
+                     {
+                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Active</span>
+                     }
+                     else if (Model.Status == "Inactive")
+                     {
+                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i> Inactive</span>
+                     }
+                     else
+                     {
+                         <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2">@Model.Status</span>
+                     }
+                </div>
+            </div>
+            
+            <div class="card-body pt-4">
+                <div class="row g-4">
+                    <!-- Left Column: Images -->
+                    <div class="col-md-5">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3 border" style="height: 300px; overflow: hidden;">
+                            @if (!string.IsNullOrEmpty(Model.ImagePath1))
+                            {
+                                <img src="@Model.ImagePath1" alt="Primary Image" style="width: 100%; height: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="fa-solid fa-image mb-2" style="font-size: 3rem;"></i>
+                                    <p class="mb-0">No Primary Image</p>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center border" style="height: 120px; overflow: hidden;">
+                                    @if (!string.IsNullOrEmpty(Model.ImagePath2))
+                                    {
+                                        <img src="@Model.ImagePath2" alt="Gallery Image 1" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                         <i class="fa-solid fa-image text-muted" style="font-size: 1.5rem;"></i>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center border" style="height: 120px; overflow: hidden;">
+                                    @if (!string.IsNullOrEmpty(Model.ImagePath3))
+                                    {
+                                        <img src="@Model.ImagePath3" alt="Gallery Image 2" style="width: 100%; height: 100%; object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                         <i class="fa-solid fa-image text-muted" style="font-size: 1.5rem;"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <dt class="col-sm-2">Product Unit:</dt>
-        <dd class="col-sm-10">@Model.ProductUnit</dd>
+                    <!-- Right Column: Info -->
+                    <div class="col-md-7 ps-md-4">
+                        <h5 class="fw-bold text-dark mb-4">Product Information</h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted fw-semibold">Category</div>
+                            <div class="col-sm-8 fw-bold">@(string.IsNullOrEmpty(Model.Category) ? "Uncategorized" : Model.Category)</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted fw-semibold">Price</div>
+                            <div class="col-sm-8 fw-bold text-primary fs-5">AED @Model.ProductRate.ToString("N2") <span class="text-muted fs-6 fw-normal">/ @Model.ProductUnit</span></div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-sm-4 text-muted fw-semibold">Description</div>
+                            <div class="col-sm-8 text-dark" style="white-space: pre-wrap;">@Model.ProductDescription</div>
+                        </div>
 
-        <dt class="col-sm-2">Product Rate:</dt>
-        <dd class="col-sm-10">@Model.ProductRate</dd>
-
-        <dt class="col-sm-2">Product Description:</dt>
-        <dd class="col-sm-10">@Model.ProductDescription</dd>
-    </dl>
+                        <div class="row mb-3 text-muted" style="font-size:0.85rem;">
+                             <div class="col-sm-4">Record ID</div>
+                             <div class="col-sm-8">#PROD-@Model.ProductId</div>
+                        </div>
+                        
+                        <hr class="my-4" style="border-color: var(--border-color); opacity: 1;">
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <a href="@Url.Action("Edit", new { id = Model.ProductId })" class="btn btn-primary fw-semibold flex-grow-1"><i class="fa-solid fa-pen-to-square me-2"></i> Edit Product</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<p>
-    <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
-</p>

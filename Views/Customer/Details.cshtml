@@ -1,30 +1,144 @@
 ﻿@model InvoiceManagementPro.Models.Customer
 
-<h1>Customer Details</h1>
+@{
+    ViewData["Title"] = "Customer Profile";
+}
 
-<div>
-   @* <h4>Customer ID: @Model.CustomerId</h4>*@
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Customer Name:</dt>
-        <dd class="col-sm-10">@Model.CustomerName</dd>
+<div class="row g-4 justify-content-center">
+    <!-- Left Col: Identity Card -->
+    <div class="col-lg-4">
+        <div class="dash-card mb-4 text-center">
+            <div class="card-body py-5">
+                <div class="mb-4 d-flex justify-content-center">
+                    @if(!string.IsNullOrEmpty(Model.LogoImagePath))
+                    {
+                        <div style="width: 140px; height: 140px; border-radius: 12px; border: 4px solid #f8f9fc; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: white;">
+                             <img src="@Model.LogoImagePath" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                        </div>
+                    }
+                    else 
+                    {
+                        <i class="fa-solid fa-building text-muted" style="font-size: 8rem;"></i>
+                    }
+                </div>
+                <h4 class="fw-bold text-dark m-0">@Model.CustomerName</h4>
+                <p class="text-muted mb-3">@Model.CustomerType</p>
+                
+                <div class="d-flex justify-content-center gap-2 mb-4">
+                     @if (Model.Status == "Active")
+                     {
+                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-check-circle me-1"></i> Active Client</span>
+                     }
+                     else 
+                     {
+                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2"><i class="fa-solid fa-times-circle me-1"></i> Inactive</span>
+                     }
+                </div>
 
-        <dt class="col-sm-2">Customer Detail:</dt>
-        <dd class="col-sm-10">@Model.CustomerDetail</dd>
+                <div class="d-flex justify-content-center gap-2">
+                     <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="btn btn-primary fw-semibold btn-sm px-4">Edit Profile</a>
+                     @if(!string.IsNullOrEmpty(Model.Email)) {
+                         <a href="mailto:@Model.Email" class="btn btn-light border fw-semibold btn-sm px-3"><i class="fa-solid fa-envelope"></i></a>
+                     }
+                </div>
+            </div>
+        </div>
 
-        <dt class="col-sm-2">Customer City:</dt>
-        <dd class="col-sm-10">@Model.CustomerCity</dd>
+         <div class="dash-card">
+            <div class="dash-card-header pb-2">
+                <h6 class="fw-bold text-dark m-0"><i class="fa-solid fa-file-invoice text-primary me-2"></i> Billing Meta</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent">
+                        <span class="text-muted fw-semibold" style="font-size:0.85rem;">GSTIN / Tax ID</span>
+                        <span class="fw-bold text-dark text-end">@(string.IsNullOrEmpty(Model.GSTIN) ? "N/A" : Model.GSTIN)</span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent">
+                        <span class="text-muted fw-semibold" style="font-size:0.85rem;">Account No</span>
+                        <span class="fw-bold text-dark text-end">@(Model.AccountNumber.HasValue ? Model.AccountNumber.ToString() : "N/A")</span>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between align-items-center bg-transparent border-0 pb-0">
+                        <span class="text-muted fw-semibold" style="font-size:0.85rem;">Client Since</span>
+                        <span class="fw-bold text-dark text-end">@(Model.CreatedAt.HasValue ? Model.CreatedAt.Value.ToString("MMM yyyy") : "Unknown")</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-        <dt class="col-sm-2">Phone Number:</dt>
-        <dd class="col-sm-10">@Model.PhoneNumber</dd>
+    <!-- Right Col: Data breakdown -->
+    <div class="col-lg-8">
+        <div class="dash-card h-100">
+            <div class="dash-card-header pb-2" style="border-bottom: 1px solid var(--border-color);">
+                <div class="d-flex align-items-center">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-light me-3"><i class="fa-solid fa-arrow-left"></i></a>
+                    <h4 class="dash-card-title m-0">Directory Information</h4>
+                </div>
+            </div>
+            
+            <div class="card-body pt-4">
+                <h6 class="fw-bold text-primary mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Contact Points</h6>
+                <div class="row mb-4">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-light rounded p-2 me-3 text-primary"><i class="fa-solid fa-user-tie fa-fw"></i></div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold mb-1">Primary Contact Person</small>
+                                <div class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.ContactPerson) ? "N/A" : Model.ContactPerson)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-5">
+                    <div class="col-sm-6 mb-3 mb-sm-0">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-light rounded p-2 me-3 text-primary"><i class="fa-solid fa-envelope fa-fw"></i></div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold mb-1">Email Address</small>
+                                <div class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.Email) ? "N/A" : Model.Email)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-start">
+                            <div class="bg-light rounded p-2 me-3 text-primary"><i class="fa-solid fa-phone fa-fw"></i></div>
+                            <div>
+                                <small class="text-muted d-block fw-semibold mb-1">Phone Number</small>
+                                <div class="fw-bold text-dark">@Model.PhoneNumber</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <h6 class="fw-bold text-primary mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Location Information</h6>
+                <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <small class="text-muted d-block fw-semibold mb-1">Billing Address</small>
+                        <div class="fw-bold text-dark">
+                            @(string.IsNullOrEmpty(Model.BillingAddress) ? "N/A" : Model.BillingAddress) <br/>
+                            @Model.CustomerCity @(string.IsNullOrEmpty(Model.State) ? "" : $", {Model.State}") @Model.ZipCode
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <small class="text-muted d-block fw-semibold mb-1">Shipping Address</small>
+                        <div class="fw-bold text-dark">
+                            @(string.IsNullOrEmpty(Model.ShippingAddress) ? "Same as Billing" : Model.ShippingAddress)
+                        </div>
+                    </div>
+                </div>
 
-        <dt class="col-sm-2">Account Number:</dt>
-        <dd class="col-sm-10">@Model.AccountNumber</dd>
-
-    </dl>
+                @if(!string.IsNullOrEmpty(Model.CustomerDetail)) {
+                    <h6 class="fw-bold text-primary mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Internal Notes</h6>
+                    <div class="bg-light p-3 rounded text-dark border">
+                        @Model.CustomerDetail
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
-
-<p>
-    <a class="btn btn-success" href="@Url.Action("Index")">Back to List</a>
-</p>

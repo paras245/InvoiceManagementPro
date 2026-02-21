@@ -1,63 +1,76 @@
-﻿@model List<InvoiceManagementPro.Models.BillView>
+﻿@model IEnumerable<InvoiceManagementPro.Models.Bill>
 
 @{
-    ViewData["Title"] = "Bill List";
+    ViewData["Title"] = "Invoices";
 }
 
-<div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background: linear-gradient(45deg, #36b9cc, #2c9faf); color: white;">
-            <h6 class="m-0 font-weight-bold text-white">Bill List</h6>
-            <div class="d-flex align-items-center">
-                <a class="btn btn-light btn-sm fw-bold text-info" href="@Url.Action("Create")">
-                    <i class="fa fa-plus"></i> Create New
-                </a>
-            </div>
+<div class="dash-card">
+    <div class="dash-card-header mb-4">
+        <h3 class="dash-card-title m-0">Invoices & Bills</h3>
+        <div class="d-flex gap-2">
+            <a class="btn btn-primary fw-semibold" asp-action="Create">
+                <i class="fa fa-plus me-1"></i> Create New Invoice
+            </a>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-hover" id="Bill" width="100%" cellspacing="0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Customer</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Qty</th>
-                            <th>Item</th>
-                            <th class="text-center" style="width: 200px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var bill in Model)
-                        {
-                            <tr>
-                                <td class="align-middle">@bill.CustomerName</td>
-                                <td class="align-middle">@bill.TotalAmount</td>
-                                <td class="align-middle">@bill.BillCreatedDate?.ToString("dd/MM/yyyy")</td>
-                                <td class="align-middle">@bill.ProductQuantity</td>
-                                <td class="align-middle">@bill.ProductName</td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        <a class="btn btn-primary btn-sm" href="@Url.Action("PrintBill", new { id = bill.BillId })" title="Print Invoice">
-                                            <i class="fa fa-print"></i>
-                                        </a>
-                                        <a class="btn btn-info btn-sm text-white" href="@Url.Action("Details", new { id = bill.BillId })" title="Details">
-                                            <i class="fa fa-info-circle"></i>
-                                        </a>
-                                        <a class="btn btn-warning btn-sm text-white" href="@Url.Action("Edit", new { id = bill.BillId })" title="Edit">
-                                            <i class="fa fa-pencil"></i>
-                                        </a>
-                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete('@Url.Action("Delete", new { id = bill.BillId })')" title="Delete">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover align-middle" id="InvoiceTable" width="100%" cellspacing="0">
+            <thead class="bg-light text-muted" style="font-size:0.85rem; text-transform:uppercase;">
+                <tr>
+                    <th>Invoice No.</th>
+                    <th>Date</th>
+                    <th>Billed To</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th class="text-end" style="width: 120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td>
+                            <div class="fw-bold text-dark">@item.InvoiceNumber</div>
+                        </td>
+                        <td>
+                            <span class="text-dark fw-medium">@item.BillCreatedDate.ToString("dd MMM yyyy")</span>
+                        </td>
+                         <td>
+                            <div class="fw-bold text-dark">@(item.Customer?.CustomerName ?? "Unknown")</div>
+                             @if(item.Customer != null && !string.IsNullOrEmpty(item.Customer.GSTIN)) {
+                                <small class="text-muted d-block">GSTIN: @item.Customer.GSTIN</small>
+                            }
+                        </td>
+                        <td>
+                             <span class="fw-bold fs-6 text-primary">₹@item.GrandTotalAmount.ToString("N2")</span>
+                        </td>
+                        <td>
+                            @if (item.Status == "Paid")
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1"><i class="fa-solid fa-check-circle me-1" style="font-size: 0.6rem;"></i> Paid</span>
+                            }
+                            else if (item.Status == "Cancelled")
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-1"><i class="fa-solid fa-times-circle me-1" style="font-size: 0.6rem;"></i> Cancelled</span>
+                            }
+                            else 
+                            {
+                                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-1"><i class="fa-solid fa-clock me-1" style="font-size: 0.6rem;"></i> Unpaid</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-light border text-primary me-1 px-3 fw-semibold" asp-action="Details" asp-route-id="@item.BillId" title="View & Print">
+                                View
+                            </a>
+                            <button type="button" class="btn btn-sm btn-light text-danger" onclick="confirmDelete('@Url.Action("Delete", new { id = item.BillId })')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -68,30 +81,46 @@
 
     <script>
         $(document).ready(function () {
-            $('#Bill').DataTable({
-                "order": [[2, "desc"]], // Sort by Date desc
+            $('#InvoiceTable').DataTable({
                 "pageLength": 10,
+                "ordering": false,
                 "language": {
+                    "search": "",
+                    "searchPlaceholder": "Search invoices...",
                     "paginate": {
-                        "previous": "<i class='fa fa-angle-left'></i>",
-                        "next": "<i class='fa fa-angle-right'></i>"
+                        "previous": "Prev",
+                        "next": "Next"
                     }
-                }
+                },
+                "dom": '<"row align-items-center mb-3"<"col-md-6"l><"col-md-6"f>>rt<"row align-items-center mt-3"<"col-md-6"i><"col-md-6"p>>'
             });
+            
+            $('.dataTables_filter input').addClass('form-control form-control-sm border');
+            $('.dataTables_length select').addClass('form-select form-select-sm border');
         });
 
         function confirmDelete(url) {
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'Delete Invoice?',
+                text: "This will permanently remove the invoice and its line items.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#e3342f',
+                cancelButtonColor: '#858796',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = url;
+                    var form = document.createElement("form");
+                    form.setAttribute("method", "post");
+                    form.setAttribute("action", url);
+                    
+                    var antiforgery = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if(antiforgery) {
+                        form.appendChild(antiforgery.cloneNode(true));
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             })
         }
