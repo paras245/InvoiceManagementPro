@@ -13,5 +13,8 @@ namespace InvoiceManagementPro.Data
         public DbSet<Product> Product { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Bill> Bill { get; set; }
+        public DbSet<BillItem> BillItem { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }
