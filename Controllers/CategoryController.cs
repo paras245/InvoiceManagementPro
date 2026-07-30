@@ -48,6 +48,7 @@ namespace InvoiceManagementPro.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category)
         {
+            //Check if the model state is valid
             if (ModelState.IsValid)
             {
                 _context.Add(category);
