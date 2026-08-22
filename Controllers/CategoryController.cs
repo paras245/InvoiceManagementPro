@@ -12,6 +12,7 @@ namespace InvoiceManagementPro.Controllers
 {
     public class CategoryController : Controller
     {
+        //Dependency Injection
         private readonly ApplicationDbContext _context;
 
         public CategoryController(ApplicationDbContext context)
